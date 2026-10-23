@@ -223,7 +223,7 @@ else:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Search & Download Hub with ShrinkMe Ad Integration
+    # Search & Download Hub with ShrinkMe Ad Integration & Secondary Direct Download Button
     st.markdown("""
         <div class="card-box">
             <h3 style="color: #dc2626; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">🔍 Search & Download Hub (Monetized)</h3>
@@ -268,8 +268,16 @@ else:
                 shortened_url = shorten_with_shrinkme(direct_url)
                 
                 st.success("YouTube Video Media Ready")
+                
+                # First Button: Monetized Ad Link
                 st.markdown(
-                    f'<a href="{shortened_url}" target="_blank" style="display:inline-block;padding:14px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);">📥 Download in Browser (Via Monetized Ad Link)</a>',
+                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:14px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download in Browser (Via Monetized Ad Link)</a>',
+                    unsafe_allow_html=True,
+                )
+                
+                # Second Button (User Requested): Direct Download Button right below it for scrolling down
+                st.markdown(
+                    f'<a href="{direct_url}" target="_blank" style="display:block;padding:12px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download (Alternative)</a>',
                     unsafe_allow_html=True,
                 )
             else:
