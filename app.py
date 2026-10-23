@@ -87,32 +87,21 @@ if "download_url" in query_params:
             },
         }
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(target_url, download=True)
-            if not isinstance(info, dict):
-                raise ValueError("No media metadata returned by YouTube downloader.")
-
+with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(target_url, download=False)
+            direct_url = info.get("url")  # यह वीडियो का डायरेक्ट लिंक होता है
             real_title = info.get("title", "ytdodo_media")
-            safe_title = sanitize_filename(real_title, "media_file")
+            safe_title = "".join([c for c in real_title if c.isalnum() or c.isspace()]).strip()
+            if not safe_title:
+                safe_title = "media_file"
+            
+            ext = "m4a" if ("MP3" in format_type.upper() or "AUDIO" in format_type.upper()) else "mp4"
             final_filename = f"{safe_title[:40]}.{ext}"
 
-            if os.path.exists(temp_filename):
-                if os.path.exists(final_filename):
-                    os.remove(final_filename)
-                os.replace(temp_filename, final_filename)
-
-        if final_filename and os.path.exists(final_filename):
-            st.success(f"Download ready: {final_filename}")
-            with open(final_filename, "rb") as media_file:
-                st.download_button(
-                    label=f"📥 Download {os.path.basename(final_filename)}",
-                    data=media_file,
-                    file_name=os.path.basename(final_filename),
-                    mime="audio/mp4" if is_audio else "video/mp4",
-                    use_container_width=True,
-                )
+        # अब st.markdown में इस direct_url को पास कर दें:
+        if direct_url:
             st.markdown(
-                "<hr style='margin-top: 1rem; margin-bottom: 1rem;'>",
+                f'<a href="{direct_url}" target="_blank" style="display:inline-block;padding:12px 20px;background-color:#ff0000;color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;width:100%;">📥 Download Video in Browser</a>',
                 unsafe_allow_html=True,
             )
     except Exception as e:
