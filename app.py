@@ -50,7 +50,7 @@ if "download_url" in query_params:
     format_type = query_params.get("format", "mp4")
 
 try:
-    if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
+        if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
             ydl_opts = {
                 "format": "bestaudio/best",
                 "outtmpl": "temp_media.m4a",
@@ -68,7 +68,7 @@ try:
                 }
             }
             ext = "m4a"
-    else:
+        else:
             ydl_opts = {
                 "format": "best[ext=mp4]/best",
                 "outtmpl": "temp_media.mp4",
