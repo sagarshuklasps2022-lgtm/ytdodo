@@ -49,18 +49,24 @@ if "download_url" in query_params:
     target_url = raw_target_url.split("&")[0].split("?si=")[0]
     format_type = query_params.get("format", "mp4")
 
-    try:
-        if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
+try:
+    if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
             ydl_opts = {
                 "format": "bestaudio/best",
                 "outtmpl": "temp_media.m4a",
                 "noplaylist": True,
                 "geo_bypass": True,
+                "nocheckcertificate": True,
                 "extractor_args": {
-                    "youtube": {"player_client": ["android", "web"]}
+                    "youtube": {
+                        "player_client": ["android", "ios", "web"]
+                    }
                 },
+                "http_headers": {
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9",
+                }
             }
-            mime = "audio/mp4"
             ext = "m4a"
         else:
             ydl_opts = {
@@ -68,25 +74,27 @@ if "download_url" in query_params:
                 "outtmpl": "temp_media.mp4",
                 "noplaylist": True,
                 "geo_bypass": True,
+                "nocheckcertificate": True,
                 "extractor_args": {
-                    "youtube": {"player_client": ["android", "web"]}
+                    "youtube": {
+                        "player_client": ["android", "ios", "web"]
+                    }
                 },
+                "http_headers": {
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9",
+                }
             }
-            mime = "video/mp4"
             ext = "mp4"
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(target_url, download=True)
             real_title = info.get("title", "ytdodo_media")
-            safe_title = "".join(
-                [c for c in real_title if c.isalnum() or c.isspace()]
-            ).strip()
+            safe_title = "".join([c for c in real_title if c.isalnum() or c.isspace()]).strip()
             if not safe_title:
                 safe_title = "media_file"
 
-            temp_filename = (
-                "temp_media.m4a" if ext == "m4a" else "temp_media.mp4"
-            )
+            temp_filename = "temp_media.m4a" if ext == "m4a" else "temp_media.mp4"
             final_filename = f"{safe_title[:40]}.{ext}"
 
             if os.path.exists(temp_filename):
@@ -94,9 +102,6 @@ if "download_url" in query_params:
                     os.remove(final_filename)
                 os.rename(temp_filename, final_filename)
 
-try:
-        # (यहाँ आपका ऊपर वाला yt-dlp डाउनलोड प्रोसेस वाला कोड रहेगा)
-        
         if os.path.exists(final_filename):
             st.markdown(
                 f'<a href="{target_url}" target="_blank" style="display:inline-block;padding:12px 20px;background-color:#ff0000;color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;width:100%;">📥 Open & Download in Browser</a>',
@@ -105,7 +110,6 @@ try:
             
     except Exception as e:
         st.error(f"Download Error: {e}")
-
 # Embedded HTML & JavaScript UI with Thumbnail Preview & Creator Branding
 html_code = """
 <!DOCTYPE html>
