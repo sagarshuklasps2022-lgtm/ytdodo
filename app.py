@@ -101,7 +101,7 @@ if "download_url" in query_params:
                     data=f,
                     file_name=final_filename,
                     mime=mime,
-                    use_container_width=True,
+                    use_container_width=False,
                 )
     except Exception as e:
         st.error(f"Download Error: {e}")
