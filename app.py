@@ -421,7 +421,7 @@ html_code = """
             }
         };
 
-        let currentLang = localStorage.getItem('ytdoodo_lang') || 'hi';
+        let currentLang = localStorage.getItem('ytdoodo_lang') || 'en';
         let currentTheme = localStorage.getItem('ytdoodo_theme') || 'dark';
         let registeredUsers = JSON.parse(localStorage.getItem('ytdoodo_users')) || [];
         let userDownloads = JSON.parse(localStorage.getItem('ytdoodo_downloads')) || [];
