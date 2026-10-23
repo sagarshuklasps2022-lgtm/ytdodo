@@ -12,7 +12,6 @@ st.set_page_config(
 
 # Robust Secure Session State Initialization for Users & Auth
 if "users_db" not in st.session_state:
-    # Default secure admin/creator account
     st.session_state.users_db = {"sagar": "Sagar@123"}
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -21,7 +20,7 @@ if "auth_mode" not in st.session_state:
 if "current_user" not in st.session_state:
     st.session_state.current_user = ""
 
-# Professional 3D Dark Theme Custom CSS & UI Enhancements matching Reference Images
+# Professional 3D Dark Theme Custom CSS & UI Styling matching Reference Images
 st.markdown("""
     <style>
     .stApp {
@@ -29,27 +28,53 @@ st.markdown("""
         color: #ffffff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    /* --- LOGIN & SIGNUP UI --- */
+    /* --- LOGIN & BANNER UI --- */
     .login-container {
         background: #131822;
-        padding: 40px;
+        padding: 30px;
         border-radius: 24px;
         border: 1px solid #30363d;
         box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         text-align: center;
-        margin-top: 50px;
+        margin-top: 20px;
         animation: fadeIn 0.5s;
     }
-    .login-header {
-        color: #ff0000;
-        font-size: 32px;
+    .banner-badge {
+        background: linear-gradient(135deg, #dc2626, #991b1b);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 11px;
         font-weight: bold;
-        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: inline-block;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+    }
+    .login-header {
+        color: #ffffff;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
     }
     .login-subheader {
         color: #9ca3af;
-        font-size: 14px;
-        margin-bottom: 30px;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+    .feature-box {
+        display: flex;
+        justify-content: space-around;
+        background: #0b0f19;
+        padding: 15px;
+        border-radius: 16px;
+        border: 1px solid #30363d;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #d1d5db;
+        font-weight: 600;
     }
     .stTextInput input {
         background-color: #0b0f19 !important;
@@ -83,7 +108,7 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
     .card-box {
@@ -115,16 +140,10 @@ st.markdown("""
         transform: translateY(-3px);
         box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
     }
-    /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-20px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #0b0f19; }
-    ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -146,17 +165,27 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- SECURE AUTHENTICATION & LOGIN FLOW (RESTRICED ACCESS) ---
+# --- SECURE AUTHENTICATION & BANNER SECTION (RESTRICTED ACCESS) ---
 if not st.session_state.logged_in:
     st.markdown('<div class="login-container">', unsafe_allow_html=True)
-    st.markdown('<p class="login-header">⚡ YT DODO APP</p>', unsafe_allow_html=True)
+    st.markdown('<span class="banner-badge">👑 NEXT-GEN MEDIA DOWNLOADER</span>', unsafe_allow_html=True)
+    st.markdown('<p class="login-header">YT DODO APP</p>', unsafe_allow_html=True)
     st.markdown('<p class="login-subheader">Universal Video & Media Downloader</p>', unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([1, 4, 1])
+    # Feature Highlights Box matching Reference Image 1
+    st.markdown("""
+        <div class="feature-box">
+            <span>⚡ Ultra Fast</span>
+            <span>🌐 Anytime Anywhere</span>
+            <span>🛡️ 100% Secure</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 5, 1])
     with col2:
         if st.session_state.auth_mode == "login":
-            st.markdown('<h3>🔐 Secure Sign In</h3>', unsafe_allow_html=True)
-            username_input = st.text_input("Username or Email", placeholder="yourusername")
+            st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔐 Secure Sign In</h4>', unsafe_allow_html=True)
+            username_input = st.text_input("Username or Email", placeholder="user@ytdodo.app")
             password_input = st.text_input("Password", type="password", placeholder="••••••••")
             
             if st.button("Sign In", use_container_width=True):
@@ -179,12 +208,12 @@ if not st.session_state.logged_in:
                     st.rerun()
 
         elif st.session_state.auth_mode == "signup":
-            st.markdown('<h3>📝 Create New Account</h3>', unsafe_allow_html=True)
+            st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">📝 Create New Account</h4>', unsafe_allow_html=True)
             new_user = st.text_input("Choose Username", placeholder="new_user")
             new_pass = st.text_input("Create Password", type="password", placeholder="••••••••")
             confirm_pass = st.text_input("Confirm Password", type="password", placeholder="••••••••")
             
-            if st.button("Register", use_container_width=True):
+            if st.button("Register & Sign In", use_container_width=True):
                 if not new_user or not new_pass:
                     st.error("Please fill all details.")
                 elif new_user in st.session_state.users_db:
@@ -193,8 +222,9 @@ if not st.session_state.logged_in:
                     st.error("Passwords do not match!")
                 else:
                     st.session_state.users_db[new_user] = new_pass
-                    st.success("Account created successfully! Please sign in.")
-                    st.session_state.auth_mode = "login"
+                    st.session_state.logged_in = True
+                    st.session_state.current_user = new_user
+                    st.success("Account created successfully! Logging in...")
                     st.rerun()
             
             if st.button("Back to Sign In", use_container_width=True):
@@ -202,7 +232,7 @@ if not st.session_state.logged_in:
                 st.rerun()
 
         elif st.session_state.auth_mode == "forgot":
-            st.markdown('<h3>🔄 Recover Password</h3>', unsafe_allow_html=True)
+            st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔄 Recover Password</h4>', unsafe_allow_html=True)
             recovery_user = st.text_input("Enter your Username")
             
             if st.button("Fetch Password", use_container_width=True):
@@ -216,14 +246,7 @@ if not st.session_state.logged_in:
                 st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Footer for Login Screen
-    st.markdown("""
-        <div style='text-align: center; color: #9ca3af; font-size: 11px; margin-top: 50px;'>
-            <p>Ultra Fast | Anytime Anywhere | 100% Secure</p>
-            <p>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: gray; font-size: 11px; margin-top: 20px;'>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
 
 else:
     # --- MAIN PROFESSIONAL 3D DARK THEME DASHBOARD (VISIBLE ONLY AFTER LOGIN) ---
@@ -249,7 +272,7 @@ else:
         st.session_state.current_user = ""
         st.rerun()
 
-    # Quick Shortcuts Section matching Reference Images
+    # Quick Shortcuts Section matching Reference Image 3
     st.markdown("""
         <div class="card-box" style="padding-bottom: 15px;">
             <p style="color: #9ca3af; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Quick Platforms & Shortcuts: Access YouTube, Insta & Google in 1-Click</p>
@@ -273,7 +296,7 @@ else:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Search & Download Hub with ShrinkMe Ad Integration & Secondary Direct Download Button
+    # Search & Download Hub matching Reference Image 4
     st.markdown("""
         <div class="card-box">
             <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">🔍 Paste any Video Link or Search Songs/Videos here! (Monetized)</h3>
@@ -338,7 +361,7 @@ else:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Active Downloads Status Box
+    # Active Downloads Status Box matching Reference Image 3 & 4
     st.markdown("""
         <div class="card-box">
             <h4 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">📁 Gallery & Active Downloads Status: Ready to manage your downloaded media</h4>
