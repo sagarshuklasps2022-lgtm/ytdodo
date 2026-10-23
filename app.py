@@ -64,49 +64,60 @@ with st.sidebar:
 
 # Direct Streamlit Download Handler with Dynamic File Naming & Label
 final_filename = None
-if "download_url" in query_params:
-    try:
-        raw_target_url = query_params["download_url"]
-        target_url = raw_target_url.split("&")[0].split("?si=")[0]
-        format_type = query_params.get("format", "mp4")
+try:
+        if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
+            ydl_opts = {
+                "format": "bestaudio/best",
+                "outtmpl": "temp_media.m4a",
+                "noplaylist": True,
+                "geo_bypass": True,
+                "nocheckcertificate": True,
+                "extractor_args": {
+                    "youtube": {
+                        "player_client": ["android", "ios", "web"]
+                    }
+                },
+                "http_headers": {
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9",
+                }
+            }
+            ext = "m4a"
+        else:
+            ydl_opts = {
+                "format": "best[ext=mp4]/best",
+                "outtmpl": "temp_media.mp4",
+                "noplaylist": True,
+                "geo_bypass": True,
+                "nocheckcertificate": True,
+                "extractor_args": {
+                    "youtube": {
+                        "player_client": ["android", "ios", "web"]
+                    }
+                },
+                "http_headers": {
+                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                    "Accept-Language": "en-US,en;q=0.9",
+                }
+            }
+            ext = "mp4"
 
-        is_audio = "mp3" in str(format_type).lower() or "audio" in str(format_type).lower()
-        ext = "m4a" if is_audio else "mp4"
-        temp_filename = "temp_media.m4a" if is_audio else "temp_media.mp4"
-
-        ydl_opts = {
-            "format": "bestaudio/best" if is_audio else "best[ext=mp4]/best",
-            "outtmpl": temp_filename,
-            "noplaylist": True,
-            "geo_bypass": True,
-            "nocheckcertificate": True,
-            "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
-            "http_headers": {
-                "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-                "Accept-Language": "en-US,en;q=0.9",
-            },
-        }
-
-with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(target_url, download=False)
-            direct_url = info.get("url")  # यह वीडियो का डायरेक्ट लिंक होता है
+            direct_url = info.get("url")
             real_title = info.get("title", "ytdodo_media")
             safe_title = "".join([c for c in real_title if c.isalnum() or c.isspace()]).strip()
             if not safe_title:
                 safe_title = "media_file"
-            
-            ext = "m4a" if ("MP3" in format_type.upper() or "AUDIO" in format_type.upper()) else "mp4"
-            final_filename = f"{safe_title[:40]}.{ext}"
 
-        # अब st.markdown में इस direct_url को पास कर दें:
         if direct_url:
             st.markdown(
                 f'<a href="{direct_url}" target="_blank" style="display:inline-block;padding:12px 20px;background-color:#ff0000;color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;width:100%;">📥 Download Video in Browser</a>',
                 unsafe_allow_html=True,
             )
+            
     except Exception as e:
         st.error(f"Download Error: {e}")
-
 
 # Embedded HTML & JavaScript UI with Thumbnail Preview & Creator Branding
 html_code = """
