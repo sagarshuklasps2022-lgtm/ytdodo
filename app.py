@@ -428,7 +428,7 @@ html_code = """
         let customShortcuts = JSON.parse(localStorage.getItem('ytdoodo_shortcuts')) || [];
         let selectedQualityType = "Video - 720p (HD)";
         let currentVideoTitle = "Media File";
-        let isDownloading = false;
+        let isDownloading = True;
 
         window.addEventListener('DOMContentLoaded', () => {
             setTheme(currentTheme);
