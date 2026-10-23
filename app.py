@@ -53,67 +53,44 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- ORIGINAL DASHBOARD UI WITH SHORTCUTS & ICONS ---
-dashboard_html = """
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YT Dodo - Universal Media Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-[#0e1117] text-white font-sans">
-    <div class="max-w-4xl mx-auto p-4">
-        <!-- Top Header & Profile Bar -->
-        <div class="flex justify-between items-center bg-[#161b22] p-4 rounded-xl border border-gray-800 mb-6 shadow-lg">
-            <div class="flex items-center space-x-3">
-                <div class="bg-red-600 p-2 rounded-lg text-white">
-                    <i class="fa-solid fa-bolt text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg tracking-wider">YT DODO</h1>
-                    <p class="text-xs text-gray-400">Welcome, Sagar Shukla</p>
-                </div>
+# --- HEADER & PROFILE BAR ---
+header_html = """
+<div class="max-w-4xl mx-auto p-4">
+    <div class="flex justify-between items-center bg-[#161b22] p-4 rounded-xl border border-gray-800 mb-6 shadow-lg" style="display: flex; justify-content: space-between; align-items: center; background-color: #161b22; padding: 16px; border-radius: 12px; border: 1px solid #30363d; margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="background-color: #dc2626; padding: 10px; border-radius: 8px; color: white; font-size: 20px;">
+                ⚡
             </div>
-            <div class="flex items-center space-x-3">
-                <button class="bg-[#21262d] p-2 rounded-lg hover:bg-gray-700 text-gray-300"><i class="fa-solid fa-user"></i></button>
-                <button class="bg-[#21262d] p-2 rounded-lg hover:bg-gray-700 text-gray-300"><i class="fa-solid fa-gear"></i></button>
+            <div>
+                <h1 style="color: white; font-weight: bold; font-size: 18px; margin: 0;">YT DODO</h1>
+                <p style="color: #9ca3af; font-size: 12px; margin: 0;">Welcome, Sagar Shukla</p>
             </div>
         </div>
-
-        <!-- Quick Platforms & Shortcuts Section -->
-        <div class="bg-[#161b22] p-5 rounded-xl border border-gray-800 mb-6 shadow-xl">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">Quick Platforms & Shortcuts</h2>
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <a href="https://www.youtube.com" target="_blank" class="bg-[#0d1117] border border-gray-700 p-3 rounded-lg text-center hover:border-red-600 transition text-xs font-semibold block text-white no-underline">
-                    <i class="fa-brands fa-youtube text-red-500 text-lg mb-1 block"></i> YouTube
-                </a>
-                <a href="https://www.google.com" target="_blank" class="bg-[#0d1117] border border-gray-700 p-3 rounded-lg text-center hover:border-red-600 transition text-xs font-semibold block text-white no-underline">
-                    <i class="fa-brands fa-google text-blue-500 text-lg mb-1 block"></i> Google
-                </a>
-                <a href="https://www.facebook.com" target="_blank" class="bg-[#0d1117] border border-gray-700 p-3 rounded-lg text-center hover:border-red-600 transition text-xs font-semibold block text-white no-underline">
-                    <i class="fa-brands fa-facebook text-blue-600 text-lg mb-1 block"></i> Facebook
-                </a>
-                <a href="https://www.instagram.com" target="_blank" class="bg-[#0d1117] border border-gray-700 p-3 rounded-lg text-center hover:border-red-600 transition text-xs font-semibold block text-white no-underline">
-                    <i class="fa-brands fa-instagram text-pink-500 text-lg mb-1 block"></i> Instagram
-                </a>
-                <a href="https://twitter.com" target="_blank" class="bg-[#0d1117] border border-gray-700 p-3 rounded-lg text-center hover:border-red-600 transition text-xs font-semibold block text-white no-underline">
-                    <i class="fa-brands fa-twitter text-sky-400 text-lg mb-1 block"></i> Twitter
-                </a>
-            </div>
+        <div style="display: flex; gap: 8px;">
+            <button style="background-color: #21262d; border: none; padding: 8px 12px; border-radius: 8px; color: #d1d5db; cursor: pointer;">👤</button>
+            <button style="background-color: #21262d; border: none; padding: 8px 12px; border-radius: 8px; color: #d1d5db; cursor: pointer;">⚙️</button>
         </div>
     </div>
-</body>
-</html>
+</div>
 """
+st.markdown(header_html, unsafe_allow_html=True)
 
-st.markdown(
-    '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">',
-    unsafe_allow_html=True,
-)
-st.markdown(dashboard_html, unsafe_allow_html=True)
+# --- QUICK SHORTCUTS SECTION ---
+shortcuts_html = """
+<div class="max-w-4xl mx-auto p-4" style="margin-top: -20px;">
+    <div style="background-color: #161b22; padding: 20px; border-radius: 12px; border: 1px solid #30363d; margin-bottom: 24px;">
+        <h2 style="color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Quick Platforms & Shortcuts</h2>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+            <a href="https://www.youtube.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">🔴 YouTube</a>
+            <a href="https://www.google.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">🔵 Google</a>
+            <a href="https://www.facebook.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">📘 Facebook</a>
+            <a href="https://www.instagram.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">📸 Instagram</a>
+            <a href="https://twitter.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">🐦 Twitter</a>
+        </div>
+    </div>
+</div>
+"""
+st.markdown(shortcuts_html, unsafe_allow_html=True)
 
 # --- SEARCH & DOWNLOAD HUB ---
 st.markdown("### 🔍 SEARCH & DOWNLOAD HUB")
@@ -152,7 +129,7 @@ if st.button("Prepare Download") and target_url:
             direct_url = info.get("url")
 
         if direct_url:
-            # Shortening through ShrinkMe API for Monetization
+            # Shortening via ShrinkMe API for ad integration
             shortened_url = shorten_with_shrinkme(direct_url)
             
             st.success("YouTube Video Media Ready")
@@ -170,7 +147,7 @@ if st.button("Prepare Download") and target_url:
 st.markdown(
     """
     <div style="background-color: #161b22; padding: 15px; border-radius: 10px; border: 1px solid #30363d; margin-top: 20px;">
-        <h4 style="color: #ff4444; font-size: 14px; margin-bottom: 5px;"><i class="fa-solid fa-folder-open"></i> Active Downloads & Gallery Status</h4>
+        <h4 style="color: #ff4444; font-size: 14px; margin-bottom: 5px;">📁 Active Downloads & Gallery Status</h4>
         <p style="color: gray; font-size: 12px; margin: 0;">No downloaded media history yet!</p>
     </div>
     """,
