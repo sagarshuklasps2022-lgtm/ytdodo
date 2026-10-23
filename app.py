@@ -94,15 +94,11 @@ if "download_url" in query_params:
                     os.remove(final_filename)
                 os.rename(temp_filename, final_filename)
 
-        if os.path.exists(final_filename):
-            with open(final_filename, "rb") as f:
-                st.download_button(
-                    label=f"💾 Save: {final_filename}",
-                    data=f,
-                    file_name=final_filename,
-                    mime=mime,
-                    use_container_width=False,
-                )
+if os.path.exists(final_filename):
+            st.markdown(
+                f'<a href="{target_url}" target="_blank" style="display:inline-block;padding:12px 20px;background-color:#ff0000;color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;width:100%;">📥 Open & Download in Browser</a>',
+                unsafe_allow_html=True,
+            )
     except Exception as e:
         st.error(f"Download Error: {e}")
 
