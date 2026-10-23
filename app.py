@@ -68,7 +68,7 @@ try:
                 }
             }
             ext = "m4a"
-        else:
+    else:
             ydl_opts = {
                 "format": "best[ext=mp4]/best",
                 "outtmpl": "temp_media.mp4",
