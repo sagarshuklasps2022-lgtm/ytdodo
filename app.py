@@ -7,19 +7,31 @@ import requests
 st.set_page_config(
     page_title="YT Dodo - Universal Media Hub",
     page_icon="📥",
-    layout="wide",
+    layout="centered",
 )
 
-# Custom CSS & Styling
+# Custom CSS for Streamlit background alignment matching the 3D dark theme
 st.markdown(
     """
     <style>
-    .main {
-        background-color: #0e1117;
+    .stApp {
+        background-color: #0b0f19;
         color: #ffffff;
     }
+    .stTextInput input {
+        background-color: #161b22 !important;
+        color: white !important;
+        border: 1px solid #30363d !important;
+        border-radius: 8px !important;
+    }
+    .stSelectbox div[data-baseweb="select"] {
+        background-color: #161b22 !important;
+        color: white !important;
+        border: 1px solid #30363d !important;
+        border-radius: 8px !important;
+    }
     .stButton>button {
-        background-color: #ff0000;
+        background-color: #dc2626;
         color: white;
         font-weight: bold;
         border-radius: 8px;
@@ -27,7 +39,7 @@ st.markdown(
         border: none;
     }
     .stButton>button:hover {
-        background-color: #cc0000;
+        background-color: #b91c1c;
         color: white;
     }
     </style>
@@ -53,51 +65,90 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- HEADER & PROFILE BAR ---
-header_html = """
-<div class="max-w-4xl mx-auto p-4">
-    <div class="flex justify-between items-center bg-[#161b22] p-4 rounded-xl border border-gray-800 mb-6 shadow-lg" style="display: flex; justify-content: space-between; align-items: center; background-color: #161b22; padding: 16px; border-radius: 12px; border: 1px solid #30363d; margin-bottom: 24px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="background-color: #dc2626; padding: 10px; border-radius: 8px; color: white; font-size: 20px;">
-                ⚡
+# --- EXACT REFERENCE 3D PROFESSIONAL DASHBOARD UI ---
+dashboard_html = """
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#0b0f19] text-white font-sans">
+    <div class="max-w-md mx-auto p-3">
+        <!-- Top Header & Profile Bar -->
+        <div class="flex justify-between items-center bg-[#131822] p-3 rounded-2xl border border-gray-800/80 mb-5 shadow-2xl">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-gradient-to-br from-red-600 to-red-700 p-2 rounded-xl text-white shadow-lg shadow-red-600/30">
+                    <i class="fa-solid fa-bolt text-base"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-wider text-white m-0">YT DODO</h1>
+                    <p class="text-[11px] text-gray-400 m-0">Welcome, Sagar Shukla</p>
+                </div>
             </div>
-            <div>
-                <h1 style="color: white; font-weight: bold; font-size: 18px; margin: 0;">YT DODO</h1>
-                <p style="color: #9ca3af; font-size: 12px; margin: 0;">Welcome, Sagar Shukla</p>
+            <div class="flex items-center space-x-2">
+                <button class="bg-[#1f242d] p-2 rounded-xl hover:bg-gray-700 text-gray-300 text-xs shadow-md"><i class="fa-solid fa-cloud text-red-500"></i></button>
+                <button class="bg-[#1f242d] px-3 py-1.5 rounded-xl hover:bg-red-600/20 hover:text-red-500 text-gray-300 text-xs font-semibold transition flex items-center space-x-1 shadow-md">
+                    <i class="fa-solid fa-power-off text-[10px]"></i> <span>Logout</span>
+                </button>
             </div>
         </div>
-        <div style="display: flex; gap: 8px;">
-            <button style="background-color: #21262d; border: none; padding: 8px 12px; border-radius: 8px; color: #d1d5db; cursor: pointer;">👤</button>
-            <button style="background-color: #21262d; border: none; padding: 8px 12px; border-radius: 8px; color: #d1d5db; cursor: pointer;">⚙️</button>
+
+        <!-- Search & Download Hub Box -->
+        <div class="bg-[#131822] p-4 rounded-2xl border border-gray-800/80 mb-5 shadow-2xl">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-red-500 mb-3 flex items-center space-x-2">
+                <i class="fa-solid fa-magnifying-glass"></i> <span>Search & Download Hub</span>
+            </h2>
+        </div>
+
+        <!-- Quick Platforms & Shortcuts Section -->
+        <div class="bg-[#131822] p-4 rounded-2xl border border-gray-800/80 mb-5 shadow-2xl">
+            <h2 class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-3">Quick Platforms & Shortcuts:</h2>
+            <div class="grid grid-cols-4 gap-2.5">
+                <a href="https://www.youtube.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
+                    <i class="fa-brands fa-youtube text-red-500 text-base mb-1 block"></i>
+                    <span class="text-[10px] font-medium text-gray-300">YouTube</span>
+                </a>
+                <a href="https://www.google.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
+                    <i class="fa-brands fa-google text-blue-500 text-base mb-1 block"></i>
+                    <span class="text-[10px] font-medium text-gray-300">Google</span>
+                </a>
+                <a href="https://www.facebook.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
+                    <i class="fa-brands fa-facebook text-blue-600 text-base mb-1 block"></i>
+                    <span class="text-[10px] font-medium text-gray-300">Facebook</span>
+                </a>
+                <a href="https://www.instagram.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
+                    <i class="fa-brands fa-instagram text-pink-500 text-base mb-1 block"></i>
+                    <span class="text-[10px] font-medium text-gray-300">Instagram</span>
+                </a>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5 mt-2.5">
+                <a href="https://twitter.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-2.5 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
+                    <i class="fa-brands fa-twitter text-sky-400 text-sm mr-1"></i> <span class="text-[10px] font-medium text-gray-300">Twitter</span>
+                </a>
+                <div class="bg-[#0b0f19] border border-dashed border-gray-700 p-2.5 rounded-xl text-center hover:border-red-600 transition cursor-pointer text-white shadow-inner">
+                    <i class="fa-solid fa-plus text-red-500 text-sm mr-1"></i> <span class="text-[10px] font-medium text-gray-300">Add URL</span>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</body>
+</html>
 """
-st.markdown(header_html, unsafe_allow_html=True)
 
-# --- QUICK SHORTCUTS SECTION ---
-shortcuts_html = """
-<div class="max-w-4xl mx-auto p-4" style="margin-top: -20px;">
-    <div style="background-color: #161b22; padding: 20px; border-radius: 12px; border: 1px solid #30363d; margin-bottom: 24px;">
-        <h2 style="color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Quick Platforms & Shortcuts</h2>
-        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-            <a href="https://www.youtube.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">🔴 YouTube</a>
-            <a href="https://www.google.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">🔵 Google</a>
-            <a href="https://www.facebook.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">📘 Facebook</a>
-            <a href="https://www.instagram.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">📸 Instagram</a>
-            <a href="https://twitter.com" target="_blank" style="background-color: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; text-align: center; color: white; text-decoration: none; font-size: 12px; font-weight: 600; display: block;">🐦 Twitter</a>
-        </div>
-    </div>
-</div>
-"""
-st.markdown(shortcuts_html, unsafe_allow_html=True)
+st.markdown(
+    '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">',
+    unsafe_allow_html=True,
+)
+st.markdown(dashboard_html, unsafe_allow_html=True)
 
-# --- SEARCH & DOWNLOAD HUB ---
-st.markdown("### 🔍 SEARCH & DOWNLOAD HUB")
-target_url = st.text_input("PASTE YOUTUBE, INSTAGRAM OR FACEBOOK LINK", placeholder="https://www.youtube.com/watch?v=...")
+# --- STREAMLIT SEARCH & DOWNLOAD FUNCTIONALITY ---
+target_url = st.text_input("Paste link or search songs, videos, apps...", placeholder="https://www.youtube.com/watch?v=...")
 format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio", "APK File"])
 
-if st.button("Prepare Download") and target_url:
+if st.button("Search & Prepare Download", use_container_width=True) and target_url:
     try:
         if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
             ydl_opts = {
@@ -129,12 +180,12 @@ if st.button("Prepare Download") and target_url:
             direct_url = info.get("url")
 
         if direct_url:
-            # Shortening via ShrinkMe API for ad integration
+            # Monetization via ShrinkMe API
             shortened_url = shorten_with_shrinkme(direct_url)
             
             st.success("YouTube Video Media Ready")
             st.markdown(
-                f'<a href="{shortened_url}" target="_blank" style="display:inline-block;padding:14px 24px;background-color:#ff0000;color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;width:100%;font-size:18px;">📥 Click Here to Download (Via Ad Link)</a>',
+                f'<a href="{shortened_url}" target="_blank" style="display:inline-block;padding:14px 24px;background-color:#dc2626;color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4);">📥 Download in Browser (Via Ad Link)</a>',
                 unsafe_allow_html=True,
             )
         else:
@@ -143,16 +194,18 @@ if st.button("Prepare Download") and target_url:
     except Exception as e:
         st.error(f"Download failed: {e}")
 
-# Active Downloads Status Section
-st.markdown(
-    """
-    <div style="background-color: #161b22; padding: 15px; border-radius: 10px; border: 1px solid #30363d; margin-top: 20px;">
-        <h4 style="color: #ff4444; font-size: 14px; margin-bottom: 5px;">📁 Active Downloads & Gallery Status</h4>
-        <p style="color: gray; font-size: 12px; margin: 0;">No downloaded media history yet!</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# Active Downloads Status Box matching reference
+status_html = """
+<div style="background-color: #131822; padding: 16px; border-radius: 16px; border: 1px solid #30363d; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <h4 style="color: #dc2626; font-size: 13px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-folder-open"></i> Active Downloads & Gallery Status
+    </h4>
+    <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.5;">
+        No active downloads right now. Click the top-right download icon to view completed files and options!
+    </p>
+</div>
+"""
+st.markdown(status_html, unsafe_allow_html=True)
 
-st.markdown("<hr style='margin-top: 2rem; margin-bottom: 1rem;'>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: gray; font-size: 12px;'>YT Dodo Universal Media Hub $\\textcircled{c}$ 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
+st.markdown("<hr style='margin-top: 2rem; margin-bottom: 1rem; border-color: #30363d;'>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: gray; font-size: 11px;'>YT Dodo Universal Media Hub $\\textcircled{c}$ 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
