@@ -10,42 +10,74 @@ st.set_page_config(
     layout="centered",
 )
 
-# Custom CSS for Streamlit background alignment matching the 3D dark theme
-st.markdown(
-    """
+# Professional 3D Dark Theme Custom CSS
+st.markdown("""
     <style>
     .stApp {
         background-color: #0b0f19;
         color: #ffffff;
     }
-    .stTextInput input {
-        background-color: #161b22 !important;
-        color: white !important;
-        border: 1px solid #30363d !important;
-        border-radius: 8px !important;
+    .main-header {
+        background: linear-gradient(145deg, #131822, #0e121b);
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid #30363d;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.6);
     }
-    .stSelectbox div[data-baseweb="select"] {
-        background-color: #161b22 !important;
+    .card-box {
+        background: linear-gradient(145deg, #131822, #0e121b);
+        padding: 22px;
+        border-radius: 18px;
+        border: 1px solid #30363d;
+        margin-bottom: 22px;
+        box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+    }
+    .stTextInput input, .stSelectbox div[data-baseweb="select"] {
+        background-color: #0b0f19 !important;
         color: white !important;
         border: 1px solid #30363d !important;
-        border-radius: 8px !important;
+        border-radius: 12px !important;
     }
     .stButton>button {
-        background-color: #dc2626;
+        background: linear-gradient(135deg, #dc2626, #991b1b);
         color: white;
         font-weight: bold;
-        border-radius: 8px;
-        padding: 10px 20px;
+        border-radius: 12px;
+        padding: 12px 20px;
         border: none;
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        transition: all 0.3s ease;
     }
     .stButton>button:hover {
-        background-color: #b91c1c;
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6);
+    }
+    .shortcut-btn {
+        background-color: #0b0f19;
+        border: 1px solid #30363d;
+        padding: 14px 10px;
+        border-radius: 14px;
+        text-align: center;
         color: white;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 10px;
+        box-shadow: inset 0 2px 5px rgba(255,255,255,0.05);
+        transition: all 0.2s ease;
+    }
+    .shortcut-btn:hover {
+        border-color: #dc2626;
+        color: #ef4444;
+        transform: translateY(-2px);
     }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
 # Sidebar / Admin Panel
 st.sidebar.title("🛠️ Admin Panel")
@@ -65,87 +97,57 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- EXACT REFERENCE 3D PROFESSIONAL DASHBOARD UI ---
-dashboard_html = """
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-[#0b0f19] text-white font-sans">
-    <div class="max-w-md mx-auto p-3">
-        <!-- Top Header & Profile Bar -->
-        <div class="flex justify-between items-center bg-[#131822] p-3 rounded-2xl border border-gray-800/80 mb-5 shadow-2xl">
-            <div class="flex items-center space-x-2.5">
-                <div class="bg-gradient-to-br from-red-600 to-red-700 p-2 rounded-xl text-white shadow-lg shadow-red-600/30">
-                    <i class="fa-solid fa-bolt text-base"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-sm tracking-wider text-white m-0">YT DODO</h1>
-                    <p class="text-[11px] text-gray-400 m-0">Welcome, Sagar Shukla</p>
-                </div>
+# Top Header UI matching 3D professional design
+st.markdown("""
+    <div class="main-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 12px; border-radius: 14px; color: white; font-size: 20px; box-shadow: 0 6px 15px rgba(220,38,38,0.5);">
+                ⚡
             </div>
-            <div class="flex items-center space-x-2">
-                <button class="bg-[#1f242d] p-2 rounded-xl hover:bg-gray-700 text-gray-300 text-xs shadow-md"><i class="fa-solid fa-cloud text-red-500"></i></button>
-                <button class="bg-[#1f242d] px-3 py-1.5 rounded-xl hover:bg-red-600/20 hover:text-red-500 text-gray-300 text-xs font-semibold transition flex items-center space-x-1 shadow-md">
-                    <i class="fa-solid fa-power-off text-[10px]"></i> <span>Logout</span>
-                </button>
+            <div>
+                <h3 style="color: white; font-weight: bold; font-size: 17px; margin: 0; letter-spacing: 0.5px;">YT DODO</h3>
+                <p style="color: #9ca3af; font-size: 11px; margin: 0;">Welcome, Sagar Shukla</p>
             </div>
         </div>
-
-        <!-- Search & Download Hub Box -->
-        <div class="bg-[#131822] p-4 rounded-2xl border border-gray-800/80 mb-5 shadow-2xl">
-            <h2 class="text-xs font-bold uppercase tracking-widest text-red-500 mb-3 flex items-center space-x-2">
-                <i class="fa-solid fa-magnifying-glass"></i> <span>Search & Download Hub</span>
-            </h2>
-        </div>
-
-        <!-- Quick Platforms & Shortcuts Section -->
-        <div class="bg-[#131822] p-4 rounded-2xl border border-gray-800/80 mb-5 shadow-2xl">
-            <h2 class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-3">Quick Platforms & Shortcuts:</h2>
-            <div class="grid grid-cols-4 gap-2.5">
-                <a href="https://www.youtube.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
-                    <i class="fa-brands fa-youtube text-red-500 text-base mb-1 block"></i>
-                    <span class="text-[10px] font-medium text-gray-300">YouTube</span>
-                </a>
-                <a href="https://www.google.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
-                    <i class="fa-brands fa-google text-blue-500 text-base mb-1 block"></i>
-                    <span class="text-[10px] font-medium text-gray-300">Google</span>
-                </a>
-                <a href="https://www.facebook.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
-                    <i class="fa-brands fa-facebook text-blue-600 text-base mb-1 block"></i>
-                    <span class="text-[10px] font-medium text-gray-300">Facebook</span>
-                </a>
-                <a href="https://www.instagram.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-3 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
-                    <i class="fa-brands fa-instagram text-pink-500 text-base mb-1 block"></i>
-                    <span class="text-[10px] font-medium text-gray-300">Instagram</span>
-                </a>
-            </div>
-            <div class="grid grid-cols-2 gap-2.5 mt-2.5">
-                <a href="https://twitter.com" target="_blank" class="bg-[#0b0f19] border border-gray-800/60 p-2.5 rounded-xl text-center hover:border-red-600 transition block text-white no-underline shadow-inner">
-                    <i class="fa-brands fa-twitter text-sky-400 text-sm mr-1"></i> <span class="text-[10px] font-medium text-gray-300">Twitter</span>
-                </a>
-                <div class="bg-[#0b0f19] border border-dashed border-gray-700 p-2.5 rounded-xl text-center hover:border-red-600 transition cursor-pointer text-white shadow-inner">
-                    <i class="fa-solid fa-plus text-red-500 text-sm mr-1"></i> <span class="text-[10px] font-medium text-gray-300">Add URL</span>
-                </div>
-            </div>
+        <div style="display: flex; gap: 10px;">
+            <span style="background-color: #1f242d; padding: 8px 12px; border-radius: 12px; font-size: 14px; cursor: pointer; border: 1px solid #30363d;">☁️</span>
+            <span style="background-color: #1f242d; padding: 8px 14px; border-radius: 12px; font-size: 12px; color: #f87171; font-weight: 600; cursor: pointer; border: 1px solid #30363d;">🚪 Logout</span>
         </div>
     </div>
-</body>
-</html>
-"""
+""", unsafe_allow_html=True)
 
-st.markdown(
-    '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">',
-    unsafe_allow_html=True,
-)
-st.markdown(dashboard_html, unsafe_allow_html=True)
+# Quick Platforms & Shortcuts Section Header
+st.markdown("""
+    <div class="card-box" style="padding-bottom: 12px;">
+        <p style="color: #9ca3af; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 1px;">Quick Platforms & Shortcuts</p>
+""", unsafe_allow_html=True)
 
-# --- STREAMLIT SEARCH & DOWNLOAD FUNCTIONALITY ---
-target_url = st.text_input("Paste link or search songs, videos, apps...", placeholder="https://www.youtube.com/watch?v=...")
+# Shortcut Grid using Streamlit Columns
+c1, c2, c3, c4 = st.columns(4)
+with c1:
+    st.markdown('<a href="https://www.youtube.com" target="_blank" class="shortcut-btn">🔴 YouTube</a>', unsafe_allow_html=True)
+with c2:
+    st.markdown('<a href="https://www.google.com" target="_blank" class="shortcut-btn">🔵 Google</a>', unsafe_allow_html=True)
+with c3:
+    st.markdown('<a href="https://www.facebook.com" target="_blank" class="shortcut-btn">📘 Facebook</a>', unsafe_allow_html=True)
+with c4:
+    st.markdown('<a href="https://www.instagram.com" target="_blank" class="shortcut-btn">📸 Instagram</a>', unsafe_allow_html=True)
+
+c5, c6 = st.columns(2)
+with c5:
+    st.markdown('<a href="https://twitter.com" target="_blank" class="shortcut-btn">🐦 Twitter</a>', unsafe_allow_html=True)
+with c6:
+    st.markdown('<div class="shortcut-btn" style="border-style: dashed; color: #9ca3af;">➕ Add URL</div>', unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# Search & Download Hub Section
+st.markdown("""
+    <div class="card-box">
+        <h3 style="color: #dc2626; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">🔍 Search & Download Hub</h3>
+""", unsafe_allow_html=True)
+
+target_url = st.text_input("PASTE YOUTUBE, INSTAGRAM OR FACEBOOK LINK", placeholder="Paste link or search songs, videos, apps...")
 format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio", "APK File"])
 
 if st.button("Search & Prepare Download", use_container_width=True) and target_url:
@@ -180,12 +182,12 @@ if st.button("Search & Prepare Download", use_container_width=True) and target_u
             direct_url = info.get("url")
 
         if direct_url:
-            # Monetization via ShrinkMe API
+            # Shortening through ShrinkMe API for Monetization
             shortened_url = shorten_with_shrinkme(direct_url)
             
             st.success("YouTube Video Media Ready")
             st.markdown(
-                f'<a href="{shortened_url}" target="_blank" style="display:inline-block;padding:14px 24px;background-color:#dc2626;color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4);">📥 Download in Browser (Via Ad Link)</a>',
+                f'<a href="{shortened_url}" target="_blank" style="display:inline-block;padding:14px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);">📥 Download in Browser (Via Ad Link)</a>',
                 unsafe_allow_html=True,
             )
         else:
@@ -194,18 +196,17 @@ if st.button("Search & Prepare Download", use_container_width=True) and target_u
     except Exception as e:
         st.error(f"Download failed: {e}")
 
-# Active Downloads Status Box matching reference
-status_html = """
-<div style="background-color: #131822; padding: 16px; border-radius: 16px; border: 1px solid #30363d; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-    <h4 style="color: #dc2626; font-size: 13px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-        <i class="fa-solid fa-folder-open"></i> Active Downloads & Gallery Status
-    </h4>
-    <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.5;">
-        No active downloads right now. Click the top-right download icon to view completed files and options!
-    </p>
-</div>
-"""
-st.markdown(status_html, unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("<hr style='margin-top: 2rem; margin-bottom: 1rem; border-color: #30363d;'>", unsafe_allow_html=True)
+# Active Downloads Status Box
+st.markdown("""
+    <div class="card-box">
+        <h4 style="color: #dc2626; font-size: 13px; font-weight: bold; margin-bottom: 8px;">📁 Active Downloads & Gallery Status</h4>
+        <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.6;">
+            No active downloads right now. Click the top-right download icon to view completed files and options!
+        </p>
+    </div>
+""", unsafe_allow_html=True)
+
+st.markdown("<hr style='border-color: #30363d; margin-top: 30px;'>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: gray; font-size: 11px;'>YT Dodo Universal Media Hub $\\textcircled{c}$ 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
