@@ -108,14 +108,15 @@
                 </select>
             </div>
 
-            <button onclick="handleSearch()" id="search-btn" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-200 text-sm cursor-pointer">
+            <!-- Instant Search Button (No loading wait) -->
+            <button onclick="handleSearch()" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-200 text-sm cursor-pointer">
                 Search
             </button>
 
-            <!-- Review Section -->
+            <!-- Review Section (Appears Instantly) -->
             <div id="review-section" class="hidden space-y-3 pt-2">
                 <div class="bg-darkBg border border-red-600/50 p-4 rounded-xl text-center space-y-2">
-                    <p class="text-xs font-semibold text-gray-300">👇 Click below to proceed with search & review:</p>
+                    <p class="text-xs font-semibold text-gray-300">👇 Click ad/review below to support us:</p>
                     <a id="shrink-ad-link" href="#" target="_blank" class="block w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:opacity-90 transition-opacity">
                         Search and Review
                     </a>
@@ -130,10 +131,10 @@
             <div id="player-section" class="hidden space-y-4 pt-3 border-t border-gray-800">
                 <div class="bg-[#1f242d] border border-gray-800 rounded-t-xl px-4 py-3 flex items-center space-x-2">
                     <span class="text-base">🎵</span>
-                    <p id="media-title" class="text-sm font-bold text-white truncate">Loading video title...</p>
+                    <p id="media-title" class="text-sm font-bold text-white truncate">YT Dodo Media Stream</p>
                 </div>
                 
-                <!-- Aapki website ka apna khud ka local HTML5 video player (3-dots download option ke sath) -->
+                <!-- Local HTML5 Video Player -->
                 <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
                     <video id="local-video-player" class="w-full h-full" controls></video>
                 </div>
@@ -162,24 +163,35 @@
     </footer>
 
     <script>
-        let fetchedStreamUrl = "";
-        let fetchedTitle = "";
-
-        async function handleSearch() {
+        function handleSearch() {
             const urlInput = document.getElementById('target-url').value;
             if(!urlInput) {
                 alert("Please paste a link first!");
                 return;
             }
 
-            const searchBtn = document.getElementById('search-btn');
-            searchBtn.innerText = "Fetching Video Details...";
-            searchBtn.disabled = true;
-
+            // Set hidden form input for final download
             document.getElementById('hidden-download-url').value = urlInput;
 
+            // Set Ad / ShrinkMe link instantly
             const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
             document.getElementById('shrink-ad-link').href = mockShrinkUrl;
+            
+            // Instantly reveal review section without waiting
+            document.getElementById('review-section').classList.remove('hidden');
+        }
+
+        async function showMediaPlayer() {
+            const urlInput = document.getElementById('target-url').value;
+            if(!urlInput) return;
+
+            const playerSection = document.getElementById('player-section');
+            const mediaTitle = document.getElementById('media-title');
+            const videoPlayer = document.getElementById('local-video-player');
+
+            mediaTitle.innerText = "Loading media stream...";
+            playerSection.classList.remove('hidden');
+            playerSection.scrollIntoView({ behavior: 'smooth' });
 
             try {
                 const response = await fetch('/get-video-info', {
@@ -189,35 +201,25 @@
                 });
                 const data = await response.json();
                 
-                if(data.stream_url) {
-                    fetchedStreamUrl = data.stream_url;
-                    fetchedTitle = data.title;
-                    searchBtn.innerText = "Search";
-                    searchBtn.disabled = false;
-                    document.getElementById('review-section').classList.remove('hidden');
-                } else {
-                    alert("Could not fetch video stream. Please try another link.");
-                    searchBtn.innerText = "Search";
-                    searchBtn.disabled = false;
+                if(data.title) {
+                    mediaTitle.innerText = data.title;
                 }
+                
+                if(data.stream_url) {
+                    videoPlayer.src = data.stream_url;
+                } else {
+                    // Fallback to direct input if stream url is empty
+                    videoPlayer.src = urlInput;
+                }
+                videoPlayer.load();
+                videoPlayer.play().catch(e => console.log("Auto-play prevented:", e));
+
             } catch(err) {
                 console.error("Error:", err);
-                alert("Server connection error!");
-                searchBtn.innerText = "Search";
-                searchBtn.disabled = false;
-            }
-        }
-
-        function showMediaPlayer() {
-            if(fetchedStreamUrl) {
-                document.getElementById('media-title').innerText = fetchedTitle;
-                const videoPlayer = document.getElementById('local-video-player');
-                videoPlayer.src = fetchedStreamUrl;
+                mediaTitle.innerText = "YT Dodo Media Stream";
+                videoPlayer.src = urlInput;
                 videoPlayer.load();
-                videoPlayer.play();
             }
-            document.getElementById('player-section').classList.remove('hidden');
-            document.getElementById('player-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         setInterval(() => {
