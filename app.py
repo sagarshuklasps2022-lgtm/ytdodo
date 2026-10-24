@@ -421,7 +421,7 @@ else:
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
                 
-         st.success("Media Ready for Download!")
+        st.success("Media Ready for Download!")
                 
                 # First Button: Renamed cleanly to "Download" for monetization/ads
                 st.markdown(
