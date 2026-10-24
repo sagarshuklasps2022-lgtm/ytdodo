@@ -207,7 +207,6 @@ if not st.session_state.logged_in:
             default_user = st.session_state.remember_user if st.session_state.remember_user else ""
             default_pass = st.session_state.remember_pass if st.session_state.remember_pass else ""
 
-            # Using form to allow pressing Enter to submit/navigate naturally
             with st.form("login_form"):
                 username_input = st.text_input("Username / YT Dodo ID", value=default_user, placeholder="user@ytdodo.app or YTDODO_xxxxxx")
                 password_input = st.text_input("Password", value=default_pass, type="password", placeholder="••••••••")
@@ -381,16 +380,10 @@ else:
 
     if st.button("Search & Prepare Download", use_container_width=True) and target_url:
         try:
+            # Safe and robust format handling to prevent "Requested format is not available" error
             if "MP3" in format_type.upper():
                 ydl_opts = {
                     "format": "bestaudio/best",
-                    "noplaylist": True,
-                    "geo_bypass": True,
-                    "nocheckcertificate": True,
-                }
-            elif "1080" in format_type:
-                ydl_opts = {
-                    "format": "best[height<=1080][ext=mp4]/best",
                     "noplaylist": True,
                     "geo_bypass": True,
                     "nocheckcertificate": True,
@@ -406,10 +399,17 @@ else:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(target_url, download=False)
                 direct_url = info.get("url")
+                thumbnail = info.get("thumbnail")
+                title = info.get("title", "Media Video")
 
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
+                
                 st.success("Media Ready for Download!")
+                
+                # Video Thumbnail Cover Display
+                if thumbnail:
+                    st.image(thumbnail, caption=f"📹 {title}", use_container_width=True)
                 
                 # Monetized Download Button
                 st.markdown(
@@ -417,7 +417,7 @@ else:
                     unsafe_allow_html=True,
                 )
                 
-                # Direct Download Alternative Button
+                # Direct Download Button Alternative
                 st.markdown(
                     f'<a href="{direct_url}" download="ytdodo_media.mp4" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download (Alternative)</a>',
                     unsafe_allow_html=True,
@@ -429,6 +429,16 @@ else:
             st.error(f"Extraction error: {ex}")
 
     st.markdown("</div>", unsafe_allow_html=True)
+
+    # Active Downloads Status Box restored
+    st.markdown("""
+        <div class="card-box">
+            <h4 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">📁 Gallery & Active Downloads Status: Ready to manage your downloaded media</h4>
+            <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.6;">
+                No active downloads right now. Completed items will appear here!
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
 # Final Footer
 st.markdown(f"<hr style='border-color: {border_color}; margin-top: 40px;'>", unsafe_allow_html=True)
