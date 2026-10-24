@@ -188,7 +188,7 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             "nocheckcertificate": True,
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android", "web", "mweb"]
+                    "player_client": ["ios", "web", "mweb"]
                 }
             },
         }
@@ -198,7 +198,6 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             direct_url = info.get("url")
             title = info.get("title", "YT Dodo Media Stream")
             
-            # Agar direct url na mile toh formats me se search karo
             if not direct_url and 'formats' in info:
                 for f in info['formats']:
                     if f.get('url') and f.get('vcodec') != 'none':
@@ -210,7 +209,6 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             
             st.success("Media Ready for Local Player Stream!")
             
-            # Video Title Header
             st.markdown(f"""
                 <div style="background:#1f242d; padding:12px 16px; border-radius:12px 12px 0 0; border:1px solid #30363d; border-bottom:none; display:flex; align-items:center; gap:10px;">
                     <span style="font-size:16px;">🎵</span>
@@ -218,10 +216,8 @@ if st.session_state.review_step and st.session_state.saved_target_url:
                 </div>
             """, unsafe_allow_html=True)
             
-            # Streamlit Native Local Player
             st.video(direct_url)
             
-            # Download Button linked with ShrinkMe Ad
             st.markdown(
                 f'<a href="{shortened_url}" target="_blank" style="display:block;padding:15px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); margin-top: 15px;">Download Now</a>',
                 unsafe_allow_html=True,
