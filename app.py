@@ -2,15 +2,20 @@ import os
 import streamlit as st
 import yt_dlp
 import requests
+import random
 
 # Page configuration
 st.set_page_config(
-    page_title="YT Dodo - Professional Media Hub",
+    page_title="YT Dodo - Next-Gen Media Downloader",
     page_icon="⚡",
     layout="centered",
 )
 
-# Initialize Session States
+# Initialize Session States for Theme, Language and Ad Flow
+if "theme_mode" not in st.session_state:
+    st.session_state.theme_mode = "Dark"
+if "app_lang" not in st.session_state:
+    st.session_state.app_lang = "English"
 if "ad_step" not in st.session_state:
     st.session_state.ad_step = False
 if "review_step" not in st.session_state:
@@ -20,45 +25,95 @@ if "saved_target_url" not in st.session_state:
 if "saved_format_type" not in st.session_state:
     st.session_state.saved_format_type = ""
 
-# Custom CSS for exact matching design
-st.markdown("""
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+# Dynamic Theme Colors based on user selection
+if st.session_state.theme_mode == "Dark":
+    bg_color = "#0b0f19"
+    card_bg = "#131822"
+    text_color = "#ffffff"
+    border_color = "#30363d"
+    sub_text = "#9ca3af"
+else:
+    bg_color = "#f3f4f6"
+    card_bg = "#ffffff"
+    text_color = "#1f2937"
+    border_color = "#d1d5db"
+    sub_text = "#4b5563"
+
+# Professional Custom CSS & UI Styling with Dynamic Themes
+st.markdown(f"""
     <style>
-        body, .stApp { 
-            font-family: 'Inter', sans-serif !important;
-            background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 35%, #0b0f19 55%, #0b0f19 100%) !important;
-            background-attachment: fixed !important;
-            color: white !important;
-        }
-        .block-container {
-            max-width: 42rem;
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-        .stTextInput input, .stSelectbox select {
-            background-color: #0b0f19 !important;
-            color: white !important;
-            border: 1px solid #1f2937 !important;
-            border-radius: 0.75rem !important;
-            padding: 12px 16px !important;
-        }
-        .stButton>button {
-            background: linear-gradient(to right, #dc2626, #991b1b) !important;
-            color: white !important;
-            font-weight: bold !important;
-            border-radius: 0.75rem !important;
-            padding: 12px 24px !important;
-            border: none !important;
-            box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4) !important;
-            width: 100% !important;
-        }
-        .stButton>button:hover {
-            background: linear-gradient(to right, #ef4444, #b91c1c) !important;
-        }
-        footer {visibility: hidden;}
+    .stApp {{
+        background-color: {bg_color};
+        color: {text_color};
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }}
+    .stTextInput input {{
+        background-color: {bg_color} !important;
+        color: {text_color} !important;
+        border: 1px solid {border_color} !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+    }}
+    .stButton>button {{
+        background: linear-gradient(135deg, #dc2626, #991b1b);
+        color: white;
+        font-weight: bold;
+        border-radius: 12px;
+        padding: 12px 24px;
+        border: none;
+        box-shadow: 0 6px 15px rgba(220, 38, 38, 0.4);
+        width: 100%;
+    }}
+    .main-header {{
+        background: {card_bg};
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid {border_color};
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }}
+    .card-box {{
+        background: {card_bg};
+        padding: 25px;
+        border-radius: 20px;
+        border: 1px solid {border_color};
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }}
+    .shortcut-btn {{
+        background: {card_bg};
+        border: 1px solid {border_color};
+        padding: 18px 10px;
+        border-radius: 18px;
+        text-align: center;
+        color: {text_color};
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }}
+    .sponsored-banner {{
+        background: {card_bg};
+        border: 1px dashed #dc2626;
+        padding: 14px;
+        border-radius: 14px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #ef4444;
+    }}
     </style>
 """, unsafe_allow_html=True)
+
+# Sidebar Preferences: Theme and Language
+st.sidebar.title("⚙️ Settings")
+st.session_state.theme_mode = st.sidebar.selectbox("Theme Mode", ["Dark", "Light"], index=0 if st.session_state.theme_mode=="Dark" else 1)
+st.session_state.app_lang = st.sidebar.selectbox("Language", ["English", "Hindi"], index=0 if st.session_state.app_lang=="English" else 1)
 
 # Function to shorten URL using ShrinkMe API
 def shorten_with_shrinkme(long_url):
@@ -72,95 +127,82 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- TOP HEADER ---
-st.markdown("""
-    <div class="w-full max-w-xl mx-auto space-y-6">
-        <div class="bg-[#131822]/95 backdrop-blur-md border border-red-500/30 p-5 rounded-2xl shadow-2xl flex items-center justify-between relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="flex items-center space-x-3.5">
-                <div class="w-16 h-14 bg-gradient-to-tr from-red-700 via-red-800 to-red-950 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/40 border border-red-400/40 relative overflow-hidden">
-                    <span class="text-2xl relative z-10 filter drop-shadow-[0_0_8px_rgba(251,191,36,0.9)] text-amber-400 font-extrabold">⚡</span>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-xl tracking-wider" style="background: linear-gradient(to right, #ef4444, #ffffff, #f87171); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">YT DODO</h1>
-                    <p class="text-xs font-semibold text-gray-400">Professional Media Hub • Creator: Sagar Shukla</p>
-                </div>
+# --- DIRECT DASHBOARD ---
+st.markdown(f"""
+    <div class="main-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 12px; border-radius: 12px; color: white; font-size: 22px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 15px rgba(220,38,38,0.5);">
+                ⚡
             </div>
-            <div class="bg-[#0b0f19]/80 border border-gray-700 px-3.5 py-2 rounded-xl flex items-center space-x-2 shadow-inner">
-                <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-                <span class="text-xs font-bold text-gray-200">Live: 1,482</span>
+            <div>
+                <h3 style="color: {text_color}; font-weight: bold; font-size: 17px; margin: 0;">YT DODO</h3>
+                <p style="color: {sub_text}; font-size: 11px; margin: 0;">Universal Media Hub | Creator: Sagar Shukla</p>
             </div>
         </div>
-
-        <!-- Sponsored Banner -->
-        <div class="bg-[#131822]/90 border border-dashed border-red-600/60 p-3.5 rounded-xl text-center text-xs text-red-400 shadow-sm backdrop-blur-sm font-medium">
-            📢 <b>SPONSORED:</b> Play Free Games & Win Big Rewards on YT Dodo Hub! 
-            <a href="https://shrinkme.io" target="_blank" class="font-bold text-red-500 underline ml-1 hover:text-red-400">INSTALL NOW</a>
-        </div>
-
-        <!-- Quick Platforms & Shortcuts -->
-        <div class="bg-[#131822]/95 backdrop-blur-md border border-gray-800 p-5 rounded-2xl shadow-xl">
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-                <span>🚀</span> Quick Platforms & Shortcuts
-            </p>
-            <div class="grid grid-cols-4 gap-3">
-                <a href="https://www.youtube.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-red-600/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center" style="text-decoration:none;">
-                    <svg class="w-6 h-6 mb-1.5 fill-red-500" viewBox="0 0 24 24" style="width:24px; height:24px;"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                    <span style="color:#f3f4f6; font-size:12px; font-weight:bold;">YouTube</span>
-                </a>
-                <a href="https://www.google.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-blue-600/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center" style="text-decoration:none;">
-                    <svg class="w-6 h-6 mb-1.5" viewBox="0 0 24 24" style="width:24px; height:24px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.21 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.19C.43 8.14 0 9.87 0 12s.43 3.86 1.19 5.39l4.08-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.21 2.68 1.19 6.61l4.08 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-                    <span style="color:#f3f4f6; font-size:12px; font-weight:bold;">Google</span>
-                </a>
-                <a href="https://www.facebook.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-blue-500/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center" style="text-decoration:none;">
-                    <svg class="w-6 h-6 mb-1.5 fill-[#1877F2]" viewBox="0 0 24 24" style="width:24px; height:24px;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                    <span style="color:#f3f4f6; font-size:12px; font-weight:bold;">Facebook</span>
-                </a>
-                <a href="https://www.instagram.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-pink-600/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center" style="text-decoration:none;">
-                    <svg class="w-6 h-6 mb-1.5 fill-[#E4405F]" viewBox="0 0 24 24" style="width:24px; height:24px;"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    <span style="color:#f3f4f6; font-size:12px; font-weight:bold;">Instagram</span>
-                </a>
-            </div>
+        <div>
+            <span style="background-color: {card_bg}; padding: 8px 12px; border-radius: 12px; font-size: 14px; border: 1px solid {border_color};">☁️ Online</span>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- DOWNLOADER SECTION ---
+# Sponsored Banner Ad
 st.markdown("""
-    <div class="w-full max-w-xl mx-auto space-y-6 mt-6">
-        <div class="bg-[#131822]/95 backdrop-blur-md border border-gray-800 p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
-            <h2 class="text-sm font-bold uppercase tracking-wide flex items-center gap-2" style="color:#ef4444;">
-                <span>🔍</span> Universal Video & Media Downloader
-            </h2>
+    <div class="sponsored-banner">
+        📢 <b>SPONSORED:</b> Play Free Games & Win Big Rewards on YT Dodo Hub! <a href="https://shrinkme.io" target="_blank" style="color:#ef4444; font-weight:bold;">INSTALL NOW</a>
+    </div>
+""", unsafe_allow_html=True)
+
+# Quick Shortcuts Section
+st.markdown(f"""
+    <div class="card-box" style="padding-bottom: 15px;">
+        <p style="color: {sub_text}; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Quick Platforms & Shortcuts</p>
+""", unsafe_allow_html=True)
+
+c1, c2, c3, c4 = st.columns(4)
+with c1:
+    st.markdown('<a href="https://www.youtube.com" target="_blank" class="shortcut-btn">🔴 YouTube</a>', unsafe_allow_html=True)
+with c2:
+    st.markdown('<a href="https://www.google.com" target="_blank" class="shortcut-btn">🔵 Google</a>', unsafe_allow_html=True)
+with c3:
+    st.markdown('<a href="https://www.facebook.com" target="_blank" class="shortcut-btn">📘 Facebook</a>', unsafe_allow_html=True)
+with c4:
+    st.markdown('<a href="https://www.instagram.com" target="_blank" class="shortcut-btn">📸 Instagram</a>', unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# --- Search & Ad Flow Hub ---
+st.markdown(f"""
+    <div class="card-box" style="margin-top: 25px;">
+        <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px;">🔍 Universal Video & Media Downloader</h3>
 """, unsafe_allow_html=True)
 
 target_url = st.text_input("Paste any YouTube, Instagram or Video link...", placeholder="https://www.youtube.com/watch?v=...")
 format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio"])
 
+# Step 1: Clean Search button
 if st.button("Search", use_container_width=True) and target_url:
     st.session_state.saved_target_url = target_url
     st.session_state.saved_format_type = format_type
     st.session_state.ad_step = True
     st.session_state.review_step = False
 
+# Step 2: Show Search and Review button linked with ShrinkMe ad
 if st.session_state.ad_step and st.session_state.saved_target_url:
     current_link = st.session_state.saved_target_url
     shortened_ad_url = shorten_with_shrinkme(current_link)
     
-    st.markdown(f"""
-        <div class="space-y-3 pt-2">
-            <div class="bg-[#0b0f19] border border-red-600/50 p-4 rounded-xl text-center space-y-2">
-                <p class="text-xs font-semibold text-gray-300">👇 Click below to proceed with search & review:</p>
-                <a href="{shortened_ad_url}" target="_blank" style="color:white; text-decoration:none; display:block; background:linear-gradient(to right, #dc2626, #991b1b); padding:12px; border-radius:8px; font-weight:bold;">
-                    Search and Review
-                </a>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        f'<div style="background:{card_bg}; padding:18px; border-radius:14px; border:1px solid #dc2626; margin-top:20px; margin-bottom:15px; text-align:center;">'
+        f'<p style="color:{text_color}; font-size:13px; font-weight:bold; margin-bottom:10px;">👇 Click below to proceed with search & review:</p>'
+        f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:10px;font-weight:bold;font-size:14px;">Search and Review</a>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
     
     if st.button("✅ Click here after review to load media player", use_container_width=True):
         st.session_state.review_step = True
 
+# Step 3: Media player and Blue Download button display
 if st.session_state.review_step and st.session_state.saved_target_url:
     try:
         active_url = st.session_state.saved_target_url
@@ -186,52 +228,45 @@ if st.session_state.review_step and st.session_state.saved_target_url:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(active_url, download=False)
             direct_url = info.get("url")
-            title = info.get("title", "Sample Media Title - YT Dodo Stream")
+            title = info.get("title", "Media_Video")
 
         if direct_url:
             shortened_url = shorten_with_shrinkme(direct_url)
             
             st.success("Media Ready for Download!")
             
+            # Video Player Display with Exact Video Title Header on Top
             st.markdown(f"""
-                <div class="space-y-4 pt-3 border-t border-gray-800">
-                    <div class="bg-[#1f242d] border border-gray-800 rounded-t-xl px-4 py-3 flex items-center space-x-2">
-                        <span class="text-base">🎵</span>
-                        <p class="text-sm font-bold text-white truncate">{title}</p>
-                    </div>
+                <div style="background:#1f242d; padding:12px 18px; border-radius:12px 12px 0 0; border:1px solid {border_color}; border-bottom:none; display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px;">🎵</span>
+                    <p style="color:#ffffff; font-size:15px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
                 </div>
             """, unsafe_allow_html=True)
-            
             st.video(direct_url)
             
-            st.markdown(f"""
-                <a href="{shortened_url}" target="_blank" style="display:block; width:100%; background:linear-gradient(to right, #2563eb, #1d4ed8); color:white; font-weight:bold; padding:14px 16px; border-radius:12px; text-align:center; text-decoration:none; margin-top:15px; margin-bottom:12px; box-shadow:0 10px 25px -5px rgba(37, 99, 235, 0.4);">
-                    Download
-                </a>
-            """, unsafe_allow_html=True)
+            # Single Monetized Download Button styled in Blue color
+            st.markdown(
+                f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-top: 15px; margin-bottom: 12px;">Download</a>',
+                unsafe_allow_html=True,
+            )
         else:
             st.error("The media link could not be processed.")
 
     except Exception as ex:
         st.error(f"Extraction error: {ex}")
 
+st.markdown("</div>", unsafe_allow_html=True)
+
+# Active Downloads Status Box
 st.markdown("""
-        </div>
+    <div class="card-box">
+        <h4 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">📁 Gallery & Active Downloads Status: Ready to manage your downloaded media</h4>
+        <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.6;">
+            No active downloads right now. Completed items will appear here!
+        </p>
     </div>
 """, unsafe_allow_html=True)
 
-# --- STATUS & FOOTER ---
-st.markdown("""
-    <div class="w-full max-w-xl mx-auto space-y-6 mt-6">
-        <div class="bg-[#131822]/95 backdrop-blur-md border border-gray-800 p-5 rounded-2xl shadow-xl space-y-2">
-            <h3 class="text-xs font-bold uppercase tracking-wide" style="color:#ef4444;">📁 Gallery & Active Downloads Status</h3>
-            <p class="text-xs leading-relaxed" style="color:#9ca3af;">
-                No active downloads right now. Completed items will appear here securely!
-            </p>
-        </div>
-        
-        <footer style="border-top:1px solid rgba(31, 41, 55, 0.6); text-align:center; color:#9ca3af; font-size:12px; margin-top:30px; padding-top:15px; padding-bottom:30px;">
-            YT Dodo Universal Media Hub © 2026 | Created by Sagar Shukla
-        </footer>
-    </div>
-""", unsafe_allow_html=True)
+# Final Footer
+st.markdown(f"<hr style='border-color: {border_color}; margin-top: 40px;'>", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align: center; color: {sub_text}; font-size: 11px;'>YT Dodo Universal Media Hub © 2026 | Created by Sagar Shukla</p>", unsafe_allow_html=True)
