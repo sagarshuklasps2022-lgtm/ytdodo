@@ -1,216 +1,494 @@
-import flet as ft
+import os
+import streamlit as st
 import yt_dlp
 import requests
 import random
 
-def main(page: ft.Page):
-    page.title = "YT Dodo - Next-Gen Media Hub"
-    page.theme_mode = ft.ThemeMode.DARK
-    page.bgcolor = "#0b0f19"
-    page.padding = 20
+# Page configuration
+st.set_page_config(
+    page_title="YT Dodo - Next-Gen Media Downloader",
+    page_icon="⚡",
+    layout="centered",
+)
 
-    # Session state variables for authentication & data
-    user_session = {"logged_in": False, "username": "Sagar", "yt_dodo_id": "YTDODO_463385"}
+# Robust Secure Session State Initialization for Users & Auth
+if "users_db" not in st.session_state:
+    st.session_state.users_db = {"sagar": {"password": "Sagar@123", "yt_dodo_id": "YTDODO_463385"}}
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "auth_mode" not in st.session_state:
+    st.session_state.auth_mode = "login"
+if "current_user" not in st.session_state:
+    st.session_state.current_user = ""
+if "remember_user" not in st.session_state:
+    st.session_state.remember_user = ""
+if "remember_pass" not in st.session_state:
+    st.session_state.remember_pass = ""
+if "new_account_created" not in st.session_state:
+    st.session_state.new_account_created = False
+if "pending_yt_id" not in st.session_state:
+    st.session_state.pending_yt_id = ""
+if "pending_pass" not in st.session_state:
+    st.session_state.pending_pass = ""
+if "pending_user" not in st.session_state:
+    st.session_state.pending_user = ""
 
-    # Professional Header
-    header = ft.Row(
-        [
-            ft.Row(
-                [
-                    ft.Container(
-                        content=ft.Text("⚡", size=20, color=ft.colors.WHITE),
-                        bgcolor="#dc2626",
-                        padding=10,
-                        border_radius=12,
-                    ),
-                    ft.Column([
-                        ft.Text("YT DODO", size=16, weight=ft.FontWeight.BOLD, color=ft.colors.WHITE),
-                        ft.Text(f"Welcome, {user_session['username']} | ID: {user_session['yt_dodo_id']}", size=10, color=ft.colors.GREY_400),
-                    ], spacing=2)
-                ],
-                spacing=10
-            ),
-            ft.IconButton(icon=ft.icons.CLOUD_QUEUE, icon_color=ft.colors.WHITE)
-        ],
-        alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-    )
+# Professional 3D Dark Theme Custom CSS & UI Styling
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #0b0f19;
+        color: #ffffff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .login-container {
+        background: #131822;
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid #30363d;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        text-align: center;
+        margin-top: 20px;
+        animation: fadeIn 0.5s;
+    }
+    .banner-badge {
+        background: linear-gradient(135deg, #dc2626, #991b1b);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: inline-block;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+    }
+    .login-header {
+        color: #ffffff;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .login-subheader {
+        color: #9ca3af;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+    .feature-box {
+        display: flex;
+        justify-content: space-around;
+        background: #0b0f19;
+        padding: 15px;
+        border-radius: 16px;
+        border: 1px solid #30363d;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #d1d5db;
+        font-weight: 600;
+    }
+    .stTextInput input {
+        background-color: #0b0f19 !important;
+        color: white !important;
+        border: 1px solid #30363d !important;
+        border-radius: 12px !important;
+        padding: 12px 16px !important;
+    }
+    .stButton>button {
+        background: linear-gradient(135deg, #dc2626, #991b1b);
+        color: white;
+        font-weight: bold;
+        border-radius: 12px;
+        padding: 12px 24px;
+        border: none;
+        box-shadow: 0 6px 15px rgba(220, 38, 38, 0.4);
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    .stButton>button:hover {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        box-shadow: 0 8px 20px rgba(220, 38, 38, 0.6);
+        transform: translateY(-2px);
+    }
+    .main-header {
+        background: linear-gradient(145deg, #131822, #0e121b);
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid #30363d;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .card-box {
+        background: linear-gradient(145deg, #131822, #0e121b);
+        padding: 25px;
+        border-radius: 20px;
+        border: 1px solid #30363d;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .shortcut-btn {
+        background: linear-gradient(135deg, #161b22, #0d1117);
+        border: 1px solid #30363d;
+        padding: 18px 10px;
+        border-radius: 18px;
+        text-align: center;
+        color: white;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);
+        transition: all 0.3s ease;
+    }
+    .shortcut-btn:hover {
+        border-color: #dc2626;
+        color: #ff4444;
+        transform: translateY(-4px);
+        box-shadow: 0 12px 25px rgba(220, 38, 38, 0.4), inset 0 1px 2px rgba(255,255,255,0.2);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-    # VidMate Style Sponsored Banner
-    sponsored_banner = ft.Container(
-        content=ft.Column([
-            ft.Row([
-                ft.Text("📢 SPONSORED", size=11, weight=ft.FontWeight.BOLD, color=ft.colors.RED_400),
-                ft.Text("Ad • Install & Earn", size=10, color=ft.colors.GREY_400),
-            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-            ft.Text("Play Free Teen Patti Games & Win Big Rewards on YT Dodo Hub!", size=12, color=ft.colors.WHITE),
-        ], spacing=4),
-        bgcolor="#131822",
-        padding=12,
-        border_radius=12,
-        border=ft.border.all(1, "#dc2626"),
-        margin=ft.margin.symmetric(vertical=10)
-    )
+# Sidebar / Admin Panel
+st.sidebar.title("🛠️ Admin Panel")
+st.sidebar.subheader("Download registered users log file:")
+if st.sidebar.button("No user logs recorded yet."):
+    pass
 
-    # In-App WebView (VidMate Style Browser)
-    webview = ft.WebView(
-        url="https://www.youtube.com",
-        expand=True,
-    )
+# Function to shorten URL using ShrinkMe API
+def shorten_with_shrinkme(long_url):
+    api_token = "5993c830ec96cd0e9e4731657116fce22629f311"
+    api_url = f"https://shrinkme.io/api?api={api_token}&url={long_url}&format=text"
+    try:
+        response = requests.get(api_url, timeout=10)
+        if response.status_code == 200 and response.text.startswith("http"):
+            return response.text.strip()
+    except Exception:
+        pass
+    return long_url
 
-    url_input = ft.TextField(
-        hint_text="Paste YouTube or Instagram link here...",
-        bgcolor="#131822",
-        color=ft.colors.WHITE,
-        border_color="#30363d",
-        border_radius=12,
-        expand=True
-    )
+# --- SECURE AUTHENTICATION & REGISTRATION FLOW ---
+if not st.session_state.logged_in:
+    st.markdown('<div class="login-container">', unsafe_allow_html=True)
+    st.markdown('<span class="banner-badge">👑 NEXT-GEN MEDIA DOWNLOADER</span>', unsafe_allow_html=True)
+    st.markdown('<p class="login-header">YT DODO APP</p>', unsafe_allow_html=True)
+    st.markdown('<p class="login-subheader">Universal Video & Media Downloader</p>', unsafe_allow_html=True)
+    
+    st.markdown("""
+        <div class="feature-box">
+            <span>⚡ Ultra Fast</span>
+            <span>🌐 Anytime Anywhere</span>
+            <span>🛡️ 100% Secure</span>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 5, 1])
+    with col2:
+        if st.session_state.auth_mode == "login":
+            st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔐 Secure Sign In</h4>', unsafe_allow_html=True)
+            
+            default_user = st.session_state.remember_user if st.session_state.remember_user else ""
+            default_pass = st.session_state.remember_pass if st.session_state.remember_pass else ""
 
-    # Quality Selector Dropdown
-    quality_dropdown = ft.Dropdown(
-        label="Select Quality / Format",
-        bgcolor="#131822",
-        color=ft.colors.WHITE,
-        border_color="#30363d",
-        border_radius=12,
-        value="Video - 720p (HD)",
-        options=[
-            ft.dropdown.Option("Video - 720p (HD)"),
-            ft.dropdown.Option("Video - 1080p (FHD)"),
-            ft.dropdown.Option("MP3 Audio"),
-        ],
-        width=200
-    )
+            username_input = st.text_input("Username / YT Dodo ID", value=default_user, placeholder="user@ytdodo.app or YTDODO_xxxxxx")
+            password_input = st.text_input("Password", value=default_pass, type="password", placeholder="••••••••")
+            
+            if st.session_state.new_account_created:
+                st.success("🎉 Account Created Successfully!")
+                shrink_dummy_url = shorten_with_shrinkme("https://ytdodo.app/welcome")
+                st.markdown(
+                    f'<div style="background:#1f242d; padding:15px; border-radius:12px; border:1px solid #dc2626; margin-bottom:15px;">'
+                    f'<p style="color:#ffffff; font-size:12px; margin-bottom:8px;"><b>✨ Your Unique YT Dodo ID:</b> <span style="color:#f87171;">{st.session_state.pending_yt_id}</span></p>'
+                    f'<p style="color:#9ca3af; font-size:11px; margin-bottom:10px;">Click below to verify your account & activate full download speed via secure link:</p>'
+                    f'<a href="{shrink_dummy_url}" target="_blank" style="display:block;padding:12px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;font-size:13px;">🔗 Activate Account via Secure Ad Link</a>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+                if st.button("I have clicked & verified! Proceed to Auto-Fill & Login"):
+                    st.session_state.remember_user = st.session_state.pending_yt_id
+                    st.session_state.remember_pass = st.session_state.pending_pass
+                    st.session_state.new_account_created = False
+                    st.rerun()
 
-    status_text = ft.Text("", size=12, color=ft.colors.GREEN_400)
-    result_container = ft.Column([], spacing=10)
+            if st.button("Sign In", use_container_width=True):
+                matched_user = None
+                for uname, udata in st.session_state.users_db.items():
+                    if (uname.lower() == username_input.strip().lower() or udata["yt_dodo_id"].lower() == username_input.strip().lower()) and udata["password"] == password_input:
+                        matched_user = uname
+                        break
+                
+                if matched_user:
+                    shrink_signin_url = shorten_with_shrinkme(f"https://ytdodo.app/login?user={matched_user}")
+                    st.markdown(
+                        f'<div style="background:#1f242d; padding:15px; border-radius:12px; border:1px solid #dc2626; margin-bottom:15px;">'
+                        f'<p style="color:#ffffff; font-size:12px; margin-bottom:8px;"><b>🔒 Security Checkpoint:</b> Verified ID: <code>{st.session_state.users_db[matched_user]["yt_dodo_id"]}</code></p>'
+                        f'<a href="{shrink_signin_url}" target="_blank" style="display:block;padding:12px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;font-size:13px;">🚀 Click Here to Proceed to Dashboard</a>'
+                        f'</div>',
+                        unsafe_allow_html=True
+                    )
+                    st.session_state.logged_in = True
+                    st.session_state.current_user = matched_user
+                    st.session_state.remember_user = username_input
+                    st.session_state.remember_pass = password_input
+                else:
+                    st.error("Invalid Credentials! Please check your username/YT ID or password.")
+            
+            if st.button("Go to Dashboard Directly (After Ad Click)", use_container_width=True):
+                if st.session_state.logged_in:
+                    st.rerun()
+                else:
+                    st.warning("Please complete sign in above.")
 
-    def shorten_with_shrinkme(long_url):
-        api_token = "5993c830ec96cd0e9e4731657116fce22629f311"
-        api_url = f"https://shrinkme.io/api?api={api_token}&url={long_url}&format=text"
-        try:
-            response = requests.get(api_url, timeout=10)
-            if response.status_code == 200 and response.text.startswith("http"):
-                return response.text.strip()
-        except Exception:
-            pass
-        return long_url
+            col_a, col_b = st.columns(2)
+            with col_a:
+                if st.button("Create New Account"):
+                    st.session_state.auth_mode = "signup"
+                    st.rerun()
+            with col_b:
+                if st.button("Forgot Password?"):
+                    st.session_state.auth_mode = "forgot"
+                    st.rerun()
 
-    def process_download(e):
-        link = url_input.value.strip()
-        selected_format = quality_dropdown.value
+        elif st.session_state.auth_mode == "signup":
+            st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">📝 Create New Account</h4>', unsafe_allow_html=True)
+            new_user = st.text_input("Choose Username", placeholder="new_user")
+            new_pass = st.text_input("Create Password", type="password", placeholder="••••••••")
+            confirm_pass = st.text_input("Confirm Password", type="password", placeholder="••••••••")
+            
+            if st.button("Register Account", use_container_width=True):
+                if not new_user or not new_pass:
+                    st.error("Please fill all details.")
+                elif new_user in st.session_state.users_db:
+                    st.error("Username already exists! Choose another.")
+                elif new_pass != confirm_pass:
+                    st.error("Passwords do not match!")
+                else:
+                    unique_yt_id = f"YTDODO_{random.randint(100000, 999999)}"
+                    st.session_state.users_db[new_user] = {"password": new_pass, "yt_dodo_id": unique_yt_id}
+                    
+                    st.session_state.pending_yt_id = unique_yt_id
+                    st.session_state.pending_pass = new_pass
+                    st.session_state.pending_user = new_user
+                    st.session_state.new_account_created = True
+                    st.session_state.auth_mode = "login"
+                    st.rerun()
+            
+            if st.button("Back to Sign In", use_container_width=True):
+                st.session_state.auth_mode = "login"
+                st.rerun()
+
+        elif st.session_state.auth_mode == "forgot":
+            st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔄 Recover Password</h4>', unsafe_allow_html=True)
+            recovery_user = st.text_input("Enter your Username or YT Dodo ID")
+            
+            if st.button("Fetch Account Details", use_container_width=True):
+                found = False
+                for uname, udata in st.session_state.users_db.items():
+                    if uname.lower() == recovery_user.strip().lower() or udata["yt_dodo_id"].lower() == recovery_user.strip().lower():
+                        st.info(f"Account Found! Username: {uname} | YT ID: {udata['yt_dodo_id']} | Password: {udata['password']}")
+                        found = True
+                        break
+                if not found:
+                    st.error("User or YT Dodo ID not found in database.")
+            
+            if st.button("Back to Sign In", use_container_width=True):
+                st.session_state.auth_mode = "login"
+                st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: gray; font-size: 11px; margin-top: 20px;'>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
+
+else:
+    # --- MAIN PROFESSIONAL 3D DARK THEME DASHBOARD (VISIBLE ONLY AFTER LOGIN) ---
+    current_uid = st.session_state.users_db.get(st.session_state.current_user, {}).get("yt_dodo_id", "YTDODO_PRO")
+    
+    st.markdown(f"""
+        <div class="main-header">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 12px; border-radius: 14px; color: white; font-size: 20px; box-shadow: 0 6px 15px rgba(220,38,38,0.5);">
+                    ⚡
+                </div>
+                <div>
+                    <h3 style="color: white; font-weight: bold; font-size: 17px; margin: 0; letter-spacing: 0.5px;">YT DODO</h3>
+                    <p style="color: #9ca3af; font-size: 11px; margin: 0;">Welcome, {st.session_state.current_user.capitalize()} | ID: <code>{current_uid}</code></p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <span style="background-color: #1f242d; padding: 8px 12px; border-radius: 12px; font-size: 14px; cursor: pointer; border: 1px solid #30363d;">☁️</span>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("🚪 Logout"):
+        st.session_state.logged_in = False
+        st.session_state.current_user = ""
+        st.rerun()
+
+    # Enhanced 3D Quick Shortcuts Section
+    st.markdown("""
+        <div class="card-box" style="padding-bottom: 15px;">
+            <p style="color: #9ca3af; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Quick Platforms & Shortcuts: Access YouTube, Insta & Google in 1-Click</p>
+    """, unsafe_allow_html=True)
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        st.markdown('<a href="https://www.youtube.com" target="_blank" class="shortcut-btn">🔴 YouTube</a>', unsafe_allow_html=True)
+    with c2:
+        st.markdown('<a href="https://www.google.com" target="_blank" class="shortcut-btn">🔵 Google</a>', unsafe_allow_html=True)
+    with c3:
+        st.markdown('<a href="https://www.facebook.com" target="_blank" class="shortcut-btn">📘 Facebook</a>', unsafe_allow_html=True)
+    with c4:
+        st.markdown('<a href="https://www.instagram.com" target="_blank" class="shortcut-btn">📸 Instagram</a>', unsafe_allow_html=True)
+
+    c5, c6 = st.columns(2)
+    with c5:
+        st.markdown('<a href="https://twitter.com" target="_blank" class="shortcut-btn">🐦 Twitter</a>', unsafe_allow_html=True)
+    with c6:
+        st.markdown('<div class="shortcut-btn" style="border-style: dashed; color: #9ca3af;">➕ Add URL</div>', unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # --- App Store & APK Downloader (Uptodown Style) ---
+    st.markdown("""
+        <div class="card-box">
+            <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">📦 App Store & APK Downloader (Uptodown Style)</h3>
+            <p style="color: #9ca3af; font-size: 12px; margin-bottom: 15px;">Directly download verified popular apps & utilities inside your YT Dodo app:</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    apk_c1, apk_c2, apk_c3 = st.columns(3)
+    with apk_c1:
+        st.markdown('<a href="https://m.uptodown.com/android" target="_blank" class="shortcut-btn">📥 VidMate APK</a>', unsafe_allow_html=True)
+    with apk_c2:
+        st.markdown('<a href="https://m.uptodown.com/android" target="_blank" class="shortcut-btn">📥 TubeMate APK</a>', unsafe_allow_html=True)
+    with apk_c3:
+        st.markdown('<a href="https://m.uptodown.com/android" target="_blank" class="shortcut-btn">📥 GB WhatsApp</a>', unsafe_allow_html=True)
+
+    # --- NEW: WhatsApp Status & Instagram/Facebook Stories & Highlights Quick Downloader Section ---
+    st.markdown("""
+        <div class="card-box">
+            <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">📱 WhatsApp Status & IG/FB Stories / Highlights Saver</h3>
+            <p style="color: #9ca3af; font-size: 12px; margin-bottom: 15px;">
+                Since direct status links are hidden by social apps, use this dedicated section to view/extract or upload saved story files for instant watermark-free downloading:
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    status_file = st.file_uploader("Upload WhatsApp Status / Story Media (.mp4 or .jpg) from your phone gallery", type=["mp4", "jpg", "png", "jpeg"])
+    if status_file is not None:
+        st.success("Media successfully loaded from your device!")
+        st.image(status_file, caption="Loaded Status Preview", use_container_width=True) if "jpg" in status_file.name or "png" in status_file.name else st.video(status_file)
         
-        if not link:
-            status_text.value = "⚠️ Please paste a valid link first!"
-            status_text.color = ft.colors.RED_400
-            page.update()
-            return
+        # Monetized Download Button for Uploaded Status
+        st.markdown(
+            f'<a href="#" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 10px;">📥 Download Clean Status (Watermark-Free)</a>',
+            unsafe_allow_html=True,
+        )
 
-        status_text.value = "⏳ Processing media and bypassing restrictions..."
-        status_text.color = ft.colors.YELLOW_400
-        result_container.controls.clear()
-        page.update()
+    # --- Search & Download Hub (Universal Video & Reels) ---
+    st.markdown("""
+        <div class="card-box" style="margin-top: 25px;">
+            <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">🔍 Universal Video, Reel & Media Downloader</h3>
+    """, unsafe_allow_html=True)
 
+    target_url = st.text_input("Paste any YouTube, Instagram Reel or Video link...", placeholder="https://www.youtube.com/watch?v=...")
+    format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio", "APK File"])
+
+    if st.button("Search & Prepare Download", use_container_width=True) and target_url:
         try:
-            if "MP3" in selected_format.upper():
+            if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
                 ydl_opts = {
                     "format": "bestaudio/best",
                     "noplaylist": True,
                     "geo_bypass": True,
+                    "geo_bypass_country": "US",
                     "nocheckcertificate": True,
+                    "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
+                    "http_headers": {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "en-US,en;q=0.5",
+                        "Sec-Fetch-Mode": "navigate",
+                    }
                 }
-            elif "1080" in selected_format:
+            elif "1080" in format_type:
                 ydl_opts = {
                     "format": "best[height<=1080][ext=mp4]/best[height<=1080]/best",
                     "noplaylist": True,
                     "geo_bypass": True,
+                    "geo_bypass_country": "US",
                     "nocheckcertificate": True,
+                    "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
+                    "http_headers": {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "en-US,en;q=0.5",
+                        "Sec-Fetch-Mode": "navigate",
+                    }
                 }
             else:
                 ydl_opts = {
                     "format": "best[ext=mp4]/best",
                     "noplaylist": True,
                     "geo_bypass": True,
+                    "geo_bypass_country": "US",
                     "nocheckcertificate": True,
+                    "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
+                    "http_headers": {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "en-US,en;q=0.5",
+                        "Sec-Fetch-Mode": "navigate",
+                    }
                 }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(link, download=False)
+                info = ydl.extract_info(target_url, download=False)
                 direct_url = info.get("url")
-                title = info.get("title", "media_file")
 
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
-                status_text.value = f"✅ Success! Media ready: {title[:35]}..."
-                status_text.color = ft.colors.GREEN_400
-
-                # Buttons matching your exact requirements
-                monetized_btn = ft.ElevatedButton(
-                    text="📥 Download (Via Ad Link)",
-                    bgcolor="#dc2626",
-                    color=ft.colors.WHITE,
-                    on_click=lambda _: page.launch_url(shortened_url)
+                
+                st.success("Media Ready for Download!")
+                
+                # Monetized Download Button
+                st.markdown(
+                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download</a>',
+                    unsafe_allow_html=True,
                 )
-
-                direct_btn = ft.ElevatedButton(
-                    text="⬇️ Direct Video Download (Alternative)",
-                    bgcolor="#21262d",
-                    color=ft.colors.GREY_400,
-                    on_click=lambda _: page.launch_url(direct_url)
+                
+                # Direct Download Button Alternative
+                st.markdown(
+                    f'<a href="{direct_url}" download="ytdodo_media.mp4" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download (Alternative)</a>',
+                    unsafe_allow_html=True,
                 )
-
-                result_container.controls.extend([monetized_btn, direct_btn])
             else:
-                status_text.value = "❌ Error: Could not fetch stream link."
-                status_text.color = ft.colors.RED_400
+                st.error("The media link could not be processed. Please verify the URL.")
 
-        except Exception as ex:
-            status_text.value = f"❌ Error: {str(ex)[:60]}"
-            status_text.color = ft.colors.RED_400
-        
-        page.update()
+        except Exception as e:
+            st.error(f"Extraction error: {e}. Please check the public URL.")
 
-    action_row = ft.Row([url_input, quality_dropdown], spacing=10)
-    download_prep_btn = ft.ElevatedButton(
-        text="🔍 Search & Prepare Download",
-        bgcolor="#dc2626",
-        color=ft.colors.WHITE,
-        on_click=process_download
-    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    # VidMate Style Navigation Bar
-    def nav_changed(e):
-        index = e.control.selected_index
-        if index == 0:
-            webview.url = "https://www.youtube.com"
-        elif index == 1:
-            webview.url = "https://music.youtube.com"
-        elif index == 2:
-            webview.url = "https://m.uptodown.com/android"
-        page.update()
+    # Active Downloads Status Box
+    st.markdown("""
+        <div class="card-box">
+            <h4 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">📁 Gallery & Active Downloads Status: Ready to manage your downloaded media</h4>
+            <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.6;">
+                No active downloads right now. Completed items will appear here!
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    nav_bar = ft.NavigationBar(
-        bgcolor="#131822",
-        selected_index=0,
-        on_change=nav_changed,
-        destinations=[
-            ft.NavigationDestination(icon=ft.icons.HOME, label="Home"),
-            ft.NavigationDestination(icon=ft.icons.MUSIC_NOTE, label="Music"),
-            ft.NavigationDestination(icon=ft.icons.APPS, label="APK Hub"),
-        ]
-    )
-
-    page.add(
-        header,
-        ft.Divider(color="#30363d"),
-        sponsored_banner,
-        action_row,
-        download_prep_btn,
-        status_text,
-        result_container,
-        ft.Divider(color="#30363d"),
-        ft.Container(content=webview, expand=True, border_radius=16, border=ft.border.all(1, "#30363d")),
-        nav_bar
-    )
-
-ft.app(target=main)
+# Final Footer for all screens
+st.markdown("<hr style='border-color: #30363d; margin-top: 40px;'>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: gray; font-size: 11px;'>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
