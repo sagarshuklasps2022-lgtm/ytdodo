@@ -20,15 +20,40 @@ def get_video_info():
         return jsonify({'error': 'URL missing'}), 400
     
     try:
+        # Aapke purane Streamlit code wale powerful ydl_opts
         ydl_opts = {
-            'extractor-args': {'youtube': {'player-client': ['android', 'web']}},
-            'skip_download': True,
+            "format": "best[ext=mp4]/best",
+            "noplaylist": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android", "ios", "web"]
+                }
+            },
+            "http_headers": {
+                "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+            },
+            "skip_download": True,
         }
+        
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             title = info.get('title', 'YT Dodo Media Stream')
-            vid_id = info.get('id', '')
-            return jsonify({'title': title, 'video_id': vid_id})
+            stream_url = info.get('url', '')
+            
+            # Agar direct url na mile toh formats se dhundo
+            if not stream_url and 'formats' in info:
+                for f in info['formats']:
+                    if f.get('url') and f.get('vcodec') != 'none':
+                        stream_url = f['url']
+                        break
+
+            return jsonify({
+                'title': title, 
+                'stream_url': stream_url
+            })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -40,9 +65,20 @@ def download():
 
     try:
         ydl_opts = {
+            "format": "best[ext=mp4]/best",
+            "noplaylist": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android", "ios", "web"]
+                }
+            },
+            "http_headers": {
+                "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "Accept-Language": "en-US,en;q=0.9",
+            },
             'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
-            'format': 'best',
-            'extractor-args': {'youtube': {'player-client': ['android', 'web']}},
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
