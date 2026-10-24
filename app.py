@@ -426,11 +426,22 @@ else:
                     unsafe_allow_html=True,
                 )
                 
-                # 2. Bottom Button named simply "Direct Video Download" with exact filename attribute so it downloads instantly in the same tab
-                st.markdown(
-                    f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download</a>',
-                    unsafe_allow_html=True,
-                )
+                # 2. Bottom Button: True Streamlit Download Button for instant saving in the same tab with exact title
+                try:
+                    with st.spinner("Preparing direct download file..."):
+                        video_bytes = requests.get(direct_url, timeout=20).content
+                    st.download_button(
+                        label="⬇️ Direct Video Download",
+                        data=video_bytes,
+                        file_name=filename,
+                        mime="video/mp4",
+                        use_container_width=True
+                    )
+                except Exception:
+                    st.markdown(
+                        f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download</a>',
+                        unsafe_allow_html=True,
+                    )
             else:
                 st.error("The media link could not be processed.")
 
