@@ -108,12 +108,12 @@
                 </select>
             </div>
 
-            <!-- Instant Search Button (No loading wait) -->
+            <!-- Instant Search Button -->
             <button onclick="handleSearch()" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-200 text-sm cursor-pointer">
                 Search
             </button>
 
-            <!-- Review Section (Appears Instantly) -->
+            <!-- Review Section -->
             <div id="review-section" class="hidden space-y-3 pt-2">
                 <div class="bg-darkBg border border-red-600/50 p-4 rounded-xl text-center space-y-2">
                     <p class="text-xs font-semibold text-gray-300">👇 Click ad/review below to support us:</p>
@@ -136,7 +136,7 @@
                 
                 <!-- Local HTML5 Video Player -->
                 <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
-                    <video id="local-video-player" class="w-full h-full" controls></video>
+                    <video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous"></video>
                 </div>
 
                 <!-- Actual Flask Download Form -->
@@ -170,14 +170,10 @@
                 return;
             }
 
-            // Set hidden form input for final download
             document.getElementById('hidden-download-url').value = urlInput;
 
-            // Set Ad / ShrinkMe link instantly
             const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
             document.getElementById('shrink-ad-link').href = mockShrinkUrl;
-            
-            // Instantly reveal review section without waiting
             document.getElementById('review-section').classList.remove('hidden');
         }
 
@@ -203,22 +199,21 @@
                 
                 if(data.title) {
                     mediaTitle.innerText = data.title;
+                } else {
+                    mediaTitle.innerText = "YT Dodo Media Stream";
                 }
                 
                 if(data.stream_url) {
                     videoPlayer.src = data.stream_url;
+                    videoPlayer.load();
+                    videoPlayer.play().catch(e => console.log("Auto-play blocked:", e));
                 } else {
-                    // Fallback to direct input if stream url is empty
-                    videoPlayer.src = urlInput;
+                    mediaTitle.innerText = "Stream link failed. Use Download Now button below.";
                 }
-                videoPlayer.load();
-                videoPlayer.play().catch(e => console.log("Auto-play prevented:", e));
 
             } catch(err) {
                 console.error("Error:", err);
-                mediaTitle.innerText = "YT Dodo Media Stream";
-                videoPlayer.src = urlInput;
-                videoPlayer.load();
+                mediaTitle.innerText = "Server connection error!";
             }
         }
 
