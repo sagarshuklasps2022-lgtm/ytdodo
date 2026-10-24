@@ -1,5 +1,4 @@
 import os
-import re
 from flask import Flask, render_template, request, send_file, jsonify
 import yt_dlp
 
@@ -54,7 +53,6 @@ def get_video_info():
                 'stream_url': stream_url
             })
     except Exception as e:
-        # अगर डायरेक्ट लिंक फेच करने में दिक्कत आए, तो भी क्रैश न हो कर सुरक्षित रिस्पांस देना
         return jsonify({
             'title': 'YT Dodo Media Stream', 
             'stream_url': url
