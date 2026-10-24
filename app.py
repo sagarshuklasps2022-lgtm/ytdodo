@@ -405,7 +405,7 @@ else:
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
                 
-                st.success("Media Ready for Playback & Download!")
+                st.success("Media Ready for Download!")
                 
                 # Clean filename generator
                 safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
@@ -420,15 +420,15 @@ else:
                 """, unsafe_allow_html=True)
                 st.video(direct_url)
                 
-                # Monetized Ad Download Link Button
+                # 1. Top Button named simply "Download" with Ad Link
                 st.markdown(
-                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 15px; margin-bottom: 12px;">📥 Download (Via Ad Link)</a>',
+                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 15px; margin-bottom: 12px;">📥 Download</a>',
                     unsafe_allow_html=True,
                 )
                 
-                # Direct Video Download Button with Exact Title (Ye button hamesha sahi naam se download karega)
+                # 2. Bottom Button named simply "Direct Video Download" with exact filename attribute so it downloads instantly in the same tab
                 st.markdown(
-                    f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:40]}...)</a>',
+                    f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download</a>',
                     unsafe_allow_html=True,
                 )
             else:
