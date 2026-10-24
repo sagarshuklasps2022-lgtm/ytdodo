@@ -1,3 +1,4 @@
-streamlit
+flask
 yt-dlp
+gunicorn
 requests
