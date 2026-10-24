@@ -207,9 +207,12 @@ if not st.session_state.logged_in:
             default_user = st.session_state.remember_user if st.session_state.remember_user else ""
             default_pass = st.session_state.remember_pass if st.session_state.remember_pass else ""
 
-            username_input = st.text_input("Username / YT Dodo ID", value=default_user, placeholder="user@ytdodo.app or YTDODO_xxxxxx")
-            password_input = st.text_input("Password", value=default_pass, type="password", placeholder="••••••••")
-            
+            # Using form to allow pressing Enter to submit/navigate naturally
+            with st.form("login_form"):
+                username_input = st.text_input("Username / YT Dodo ID", value=default_user, placeholder="user@ytdodo.app or YTDODO_xxxxxx")
+                password_input = st.text_input("Password", value=default_pass, type="password", placeholder="••••••••")
+                submit_login = st.form_submit_button("Sign In")
+
             if st.session_state.new_account_created:
                 st.success("🎉 Account Created Successfully!")
                 shrink_dummy_url = shorten_with_shrinkme("https://ytdodo.app/welcome")
@@ -226,7 +229,7 @@ if not st.session_state.logged_in:
                     st.session_state.new_account_created = False
                     st.rerun()
 
-            if st.button("Sign In", use_container_width=True):
+            if submit_login:
                 matched_user = None
                 for uname, udata in st.session_state.users_db.items():
                     if (uname.lower() == username_input.strip().lower() or udata["yt_dodo_id"].lower() == username_input.strip().lower()) and udata["password"] == password_input:
@@ -267,11 +270,13 @@ if not st.session_state.logged_in:
 
         elif st.session_state.auth_mode == "signup":
             st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">📝 Create New Account</h4>', unsafe_allow_html=True)
-            new_user = st.text_input("Choose Username", placeholder="new_user")
-            new_pass = st.text_input("Create Password", type="password", placeholder="••••••••")
-            confirm_pass = st.text_input("Confirm Password", type="password", placeholder="••••••••")
+            with st.form("signup_form"):
+                new_user = st.text_input("Choose Username", placeholder="new_user")
+                new_pass = st.text_input("Create Password", type="password", placeholder="••••••••")
+                confirm_pass = st.text_input("Confirm Password", type="password", placeholder="••••••••")
+                submit_signup = st.form_submit_button("Register Account")
             
-            if st.button("Register Account", use_container_width=True):
+            if submit_signup:
                 if not new_user or not new_pass:
                     st.error("Please fill all details.")
                 elif new_user in st.session_state.users_db:
@@ -294,9 +299,11 @@ if not st.session_state.logged_in:
 
         elif st.session_state.auth_mode == "forgot":
             st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔄 Recover Password</h4>', unsafe_allow_html=True)
-            recovery_user = st.text_input("Enter your Username or YT Dodo ID")
+            with st.form("forgot_form"):
+                recovery_user = st.text_input("Enter your Username or YT Dodo ID")
+                submit_forgot = st.form_submit_button("Fetch Account Details")
             
-            if st.button("Fetch Account Details", use_container_width=True):
+            if submit_forgot:
                 found = False
                 for uname, udata in st.session_state.users_db.items():
                     if uname.lower() == recovery_user.strip().lower() or udata["yt_dodo_id"].lower() == recovery_user.strip().lower():
@@ -313,7 +320,7 @@ if not st.session_state.logged_in:
     st.markdown('</div>', unsafe_allow_html=True)
 
 else:
-    # --- MAIN DASHBOARD WITH SQUARE SQUARE BIJLI ICON ---
+    # --- MAIN DASHBOARD WITH SQUARE BIJLI ICON ---
     current_uid = st.session_state.users_db.get(st.session_state.current_user, {}).get("yt_dodo_id", "YTDODO_PRO")
     
     st.markdown(f"""
@@ -418,8 +425,8 @@ else:
             else:
                 st.error("The media link could not be processed.")
 
-        except Exception as e:
-            st.error(f"Extraction error: {e}")
+        except Exception as ex:
+            st.error(f"Extraction error: {ex}")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
