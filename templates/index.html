@@ -37,10 +37,9 @@
 </head>
 <body class="text-white min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 selection:bg-red-600 selection:text-white">
 
-    <!-- Main Container -->
     <div class="w-full max-w-xl mx-auto space-y-6">
 
-        <!-- Top Dashboard Header with Square Wider Golden Lightning Icon & Visitor Counter -->
+        <!-- Header -->
         <div class="bg-cardBg/95 backdrop-blur-md border border-red-500/30 p-5 rounded-2xl shadow-2xl flex items-center justify-between relative overflow-hidden">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl pointer-events-none"></div>
             <div class="flex items-center space-x-3.5">
@@ -64,7 +63,7 @@
             <a href="https://shrinkme.io" target="_blank" class="font-bold text-red-500 underline ml-1 hover:text-red-400">INSTALL NOW</a>
         </div>
 
-        <!-- Quick Platforms & Shortcuts Section -->
+        <!-- Quick Platforms -->
         <div class="bg-cardBg/95 backdrop-blur-md border border-gray-800 p-5 rounded-2xl shadow-xl">
             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
                 <span>🚀</span> Quick Platforms & Shortcuts
@@ -89,7 +88,7 @@
             </div>
         </div>
 
-        <!-- Search & Downloader Hub Card -->
+        <!-- Downloader Hub -->
         <div class="bg-cardBg/95 backdrop-blur-md border border-gray-800 p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
             <h2 class="text-sm font-bold text-red-500 uppercase tracking-wide flex items-center gap-2">
                 <span>🔍</span> Universal Video & Media Downloader
@@ -103,9 +102,9 @@
             <div>
                 <label class="block text-xs font-medium text-gray-400 mb-1.5">Choose output format</label>
                 <select id="format-type" class="w-full bg-darkBg border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600 transition-colors">
-                    <option>Video - 720p (HD)</option>
-                    <option>Video - 1080p (FHD)</option>
-                    <option>MP3 Audio</option>
+                    <option value="best">Video - 720p (HD)</option>
+                    <option value="1080">Video - 1080p (FHD)</option>
+                    <option value="audio">MP3 Audio</option>
                 </select>
             </div>
 
@@ -113,10 +112,11 @@
                 Search
             </button>
 
+            <!-- Review Section -->
             <div id="review-section" class="hidden space-y-3 pt-2">
                 <div class="bg-darkBg border border-red-600/50 p-4 rounded-xl text-center space-y-2">
                     <p class="text-xs font-semibold text-gray-300">👇 Click below to proceed with search & review:</p>
-                    <a id="shrink-ad-link" href="#" target="_blank" onclick="enablePlayerLoad()" class="block w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:opacity-90 transition-opacity">
+                    <a id="shrink-ad-link" href="#" target="_blank" class="block w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:opacity-90 transition-opacity">
                         Search and Review
                     </a>
                 </div>
@@ -126,24 +126,27 @@
                 </button>
             </div>
 
+            <!-- Media Player & Real Download Form -->
             <div id="player-section" class="hidden space-y-4 pt-3 border-t border-gray-800">
                 <div class="bg-[#1f242d] border border-gray-800 rounded-t-xl px-4 py-3 flex items-center space-x-2">
                     <span class="text-base">🎵</span>
-                    <p id="media-title" class="text-sm font-bold text-white truncate">Sample Media Title - YT Dodo Stream</p>
+                    <p id="media-title" class="text-sm font-bold text-white truncate">Loading title...</p>
                 </div>
                 
                 <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 flex items-center justify-center relative">
-                    <iframe id="video-iframe" class="w-full h-full" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+                    <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
                 </div>
 
-                <a id="download-btn" href="https://shrinkme.io" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/30 text-center text-sm transition-all duration-200">
-                    Download
-                </a>
+                <!-- Actual Flask Download Form -->
+                <form action="/download" method="POST">
+                    <input type="hidden" name="url" id="hidden-download-url">
+                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/30 text-center text-sm transition-all duration-200 cursor-pointer">
+                        Download Now
+                    </button>
+                </form>
             </div>
-
         </div>
 
-        <!-- Active Downloads Status Box -->
         <div class="bg-cardBg/95 backdrop-blur-md border border-gray-800 p-5 rounded-2xl shadow-xl space-y-2">
             <h3 class="text-xs font-bold text-red-500 uppercase tracking-wide">📁 Gallery & Active Downloads Status</h3>
             <p class="text-xs text-gray-400 leading-relaxed">
@@ -153,26 +156,51 @@
 
     </div>
 
-    <!-- Footer -->
     <footer class="mt-8 text-center text-xs text-gray-400 border-t border-gray-800/60 pt-4 w-full">
         YT Dodo Universal Media Hub © 2026 | Created by Sagar Shukla
     </footer>
 
-    <!-- JavaScript -->
     <script>
-        function handleSearch() {
+        let fetchedVideoId = "";
+        let fetchedTitle = "";
+
+        async function handleSearch() {
             const urlInput = document.getElementById('target-url').value;
             if(!urlInput) {
+                alert("Please enter a valid link!");
                 return;
             }
+
+            // Set hidden form input for final download
+            document.getElementById('hidden-download-url').value = urlInput;
+
+            // Mock ad link
             const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
             document.getElementById('shrink-ad-link').href = mockShrinkUrl;
             document.getElementById('review-section').classList.remove('hidden');
+
+            // Fetch real info from backend
+            try {
+                const response = await fetch('/get-video-info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput })
+                });
+                const data = await response.json();
+                if(data.video_id) {
+                    fetchedVideoId = data.video_id;
+                    fetchedTitle = data.title;
+                }
+            } catch (err) {
+                console.error("Error fetching info:", err);
+            }
         }
 
-        function enablePlayerLoad() {}
-
         function showMediaPlayer() {
+            if(fetchedVideoId) {
+                document.getElementById('media-title').innerText = fetchedTitle;
+                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + fetchedVideoId;
+            }
             document.getElementById('player-section').classList.remove('hidden');
             document.getElementById('player-section').scrollIntoView({ behavior: 'smooth' });
         }
