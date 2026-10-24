@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, jsonify
 import yt_dlp
 
 app = Flask(__name__)
@@ -12,6 +12,26 @@ if not os.path.exists(DOWNLOAD_FOLDER):
 def index():
     return render_template('index.html')
 
+@app.route('/get-video-info', methods=['POST'])
+def get_video_info():
+    data = request.get_json()
+    url = data.get('url')
+    if not url:
+        return jsonify({'error': 'URL missing'}), 400
+    
+    try:
+        ydl_opts = {
+            'extractor-args': {'youtube': {'player-client': ['android', 'web']}},
+            'skip_download': True,
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            title = info.get('title', 'Unknown Title')
+            vid_id = info.get('id', '')
+            return jsonify({'title': title, 'video_id': vid_id})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/download', methods=['POST'])
 def download():
     url = request.form.get('url')
@@ -22,7 +42,6 @@ def download():
         ydl_opts = {
             'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
             'format': 'best',
-            # YouTube बॉट एरर से बचने के लिए एक्सट्रैक्टर आर्ग्यूमेंट्स
             'extractor-args': {'youtube': {'player-client': ['android', 'web']}},
         }
         
