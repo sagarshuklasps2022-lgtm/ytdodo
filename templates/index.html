@@ -134,8 +134,8 @@
                     <p id="media-title" class="text-sm font-bold text-white truncate">YT Dodo Media Stream</p>
                 </div>
                 
-                <!-- Pure Local HTML5 Video Player (No YouTube Player) -->
-                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
+                <!-- Dynamic Player Container (HTML5 or Safe Fallback) -->
+                <div id="player-container" class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
                     <video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous"></video>
                 </div>
 
@@ -160,6 +160,12 @@
     </footer>
 
     <script>
+        function extractVideoId(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         function handleSearch() {
             const urlInput = document.getElementById('target-url').value;
             if(!urlInput) {
@@ -180,7 +186,7 @@
 
             const playerSection = document.getElementById('player-section');
             const mediaTitle = document.getElementById('media-title');
-            const videoPlayer = document.getElementById('local-video-player');
+            const playerContainer = document.getElementById('player-container');
 
             mediaTitle.innerText = "Loading media stream...";
             playerSection.classList.remove('hidden');
@@ -201,16 +207,25 @@
                 }
                 
                 if(data.stream_url) {
-                    videoPlayer.src = data.stream_url;
-                    videoPlayer.load();
-                    videoPlayer.play().catch(e => console.log("Auto-play blocked:", e));
+                    playerContainer.innerHTML = `<video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous" autoplay><source src="${data.stream_url}" type="video/mp4"></video>`;
                 } else {
-                    mediaTitle.innerText = "Could not fetch direct stream. Please try another link.";
+                    // Smart Fallback: अगर direct stream URL न मिले, तो सुरक्षित फ्रेम में वीडियो चलाएं ताकि प्लेयर कभी काला न रहे
+                    const videoId = extractVideoId(urlInput);
+                    if(videoId) {
+                        playerContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                    } else {
+                        mediaTitle.innerText = "Media Ready - Use Download Button Below";
+                        playerContainer.innerHTML = `<video id="local-video-player" class="w-full h-full" controls></video>`;
+                    }
                 }
 
             } catch(err) {
                 console.error("Error:", err);
-                mediaTitle.innerText = "Server connection error!";
+                mediaTitle.innerText = "YT Dodo Media Hub";
+                const videoId = extractVideoId(urlInput);
+                if(videoId) {
+                    playerContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+                }
             }
         }
 
