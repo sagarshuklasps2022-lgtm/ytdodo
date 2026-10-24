@@ -11,11 +11,17 @@ st.set_page_config(
     layout="centered",
 )
 
-# Initialize Session States for Theme and Language
+# Initialize Session States for Theme, Language and Ad Flow
 if "theme_mode" not in st.session_state:
     st.session_state.theme_mode = "Dark"
 if "app_lang" not in st.session_state:
     st.session_state.app_lang = "English"
+if "ad_step" not in st.session_state:
+    st.session_state.ad_step = False
+if "saved_target_url" not in st.session_state:
+    st.session_state.saved_target_url = ""
+if "saved_format_type" not in st.session_state:
+    st.session_state.saved_format_type = ""
 
 # Dynamic Theme Colors based on user selection
 if st.session_state.theme_mode == "Dark":
@@ -162,7 +168,7 @@ with c4:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- Search & Download Hub ---
+# --- Search & Monetized Ad Flow Hub ---
 st.markdown(f"""
     <div class="card-box" style="margin-top: 25px;">
         <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px;">🔍 Universal Video & Media Downloader</h3>
@@ -171,91 +177,114 @@ st.markdown(f"""
 target_url = st.text_input("Paste any YouTube, Instagram or Video link...", placeholder="https://www.youtube.com/watch?v=...")
 format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio"])
 
-if st.button("Search & Prepare Download", use_container_width=True) and target_url:
-    try:
-        if "MP3" in format_type.upper():
-            ydl_opts = {
-                "format": "bestaudio/best",
-                "noplaylist": True,
-                "geo_bypass": True,
-                "nocheckcertificate": True,
-                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
-            }
-        else:
-            ydl_opts = {
-                "format": "best[ext=mp4]/best",
-                "noplaylist": True,
-                "geo_bypass": True,
-                "nocheckcertificate": True,
-                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
-            }
+# Step 1: User clicks search button to trigger ad
+if st.button("Search & View Sponsored Ad", use_container_width=True) and target_url:
+    st.session_state.saved_target_url = target_url
+    st.session_state.saved_format_type = format_type
+    st.session_state.ad_step = True
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(target_url, download=False)
-            direct_url = info.get("url")
-            title = info.get("title", "Media_Video")
+# If ad step is triggered, show the monetized link and return verification button
+if st.session_state.ad_step and st.session_state.saved_target_url:
+    current_link = st.session_state.saved_target_url
+    shortened_ad_url = shorten_with_shrinkme(current_link)
+    
+    st.markdown(
+        f'<div style="background:{card_bg}; padding:18px; border-radius:14px; border:1px solid #dc2626; margin-top:20px; margin-bottom:15px; text-align:center;">'
+        f'<p style="color:{text_color}; font-size:13px; font-weight:bold; margin-bottom:10px;">🎁 Step 1: Click below to support creator & unlock media search:</p>'
+        f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:10px;font-weight:bold;font-size:14px;">🔗 Click Here to Open Sponsored Ad Link</a>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
+    
+    # Step 2: Confirmation button after visiting ad
+    if st.button("✅ I have completed the ad! Load Media Player", use_container_width=True):
+        try:
+            active_url = st.session_state.saved_target_url
+            active_format = st.session_state.saved_format_type
+            
+            if "MP3" in active_format.upper():
+                ydl_opts = {
+                    "format": "bestaudio/best",
+                    "noplaylist": True,
+                    "geo_bypass": True,
+                    "nocheckcertificate": True,
+                    "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+                }
+            else:
+                ydl_opts = {
+                    "format": "best[ext=mp4]/best",
+                    "noplaylist": True,
+                    "geo_bypass": True,
+                    "nocheckcertificate": True,
+                    "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+                }
 
-        if direct_url:
-            shortened_url = shorten_with_shrinkme(direct_url)
-            
-            st.success("Media Ready for Download!")
-            
-            # Clean filename generator
-            safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
-            filename = f"{safe_title}.mp4"
-            
-            # Video Player Display with Exact Video Title Header on Top
-            st.markdown(f"""
-                <div style="background:#1f242d; padding:12px 18px; border-radius:12px 12px 0 0; border:1px solid {border_color}; border-bottom:none; display:flex; align-items:center; gap:10px;">
-                    <span style="font-size:18px;">🎵</span>
-                    <p style="color:#ffffff; font-size:15px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
-                </div>
-            """, unsafe_allow_html=True)
-            st.video(direct_url)
-            
-            # 1. Download Button (Via Ad Link / ShrinkMe)
-            st.markdown(
-                f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 15px; margin-bottom: 12px;">Download</a>',
-                unsafe_allow_html=True,
-            )
-            
-            # 2. Direct Video Download using server-side yt_dlp processing
-            if st.button("Direct Video Download", use_container_width=True):
-                with st.spinner("Downloading media securely... Please wait."):
-                    try:
-                        out_file = f"ytdodo_{random.randint(1000,9999)}.mp4"
-                        dl_opts = {
-                            "format": "best[ext=mp4]/best",
-                            "outtmpl": out_file,
-                            "noplaylist": True,
-                            "geo_bypass": True,
-                            "nocheckcertificate": True,
-                            "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
-                        }
-                        with yt_dlp.YoutubeDL(dl_opts) as ydl_dl:
-                            ydl_dl.download([target_url])
-                        
-                        if os.path.exists(out_file) and os.path.getsize(out_file) > 1000:
-                            with open(out_file, "rb") as f:
-                                video_bytes = f.read()
-                            os.remove(out_file)
-                            st.download_button(
-                                label="💾 Click here to save file now",
-                                data=video_bytes,
-                                file_name=filename,
-                                mime="video/mp4",
-                                use_container_width=True
-                            )
-                            st.success("File ready! Click the save button above.")
-                        else:
-                            st.error("Download failed or file is empty.")
-                    except Exception as e:
-                        st.error(f"Download error: {e}")
-        else:
-            st.error("The media link could not be processed.")
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(active_url, download=False)
+                direct_url = info.get("url")
+                title = info.get("title", "Media_Video")
 
-    except Exception as ex:
-        st.error(f"Extraction error: {ex}")
+            if direct_url:
+                shortened_url = shorten_with_shrinkme(direct_url)
+                
+                st.success("Media Ready for Download!")
+                
+                # Clean filename generator
+                safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
+                filename = f"{safe_title}.mp4"
+                
+                # Video Player Display with Exact Video Title Header on Top
+                st.markdown(f"""
+                    <div style="background:#1f242d; padding:12px 18px; border-radius:12px 12px 0 0; border:1px solid {border_color}; border-bottom:none; display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:18px;">🎵</span>
+                        <p style="color:#ffffff; font-size:15px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                st.video(direct_url)
+                
+                # 1. Download Button (Via Ad Link / ShrinkMe)
+                st.markdown(
+                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 15px; margin-bottom: 12px;">Download</a>',
+                    unsafe_allow_html=True,
+                )
+                
+                # 2. Direct Video Download using server-side yt_dlp processing
+                if st.button("Direct Video Download", use_container_width=True):
+                    with st.spinner("Downloading media securely... Please wait."):
+                        try:
+                            out_file = f"ytdodo_{random.randint(1000,9999)}.mp4"
+                            dl_opts = {
+                                "format": "best[ext=mp4]/best",
+                                "outtmpl": out_file,
+                                "noplaylist": True,
+                                "geo_bypass": True,
+                                "nocheckcertificate": True,
+                                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+                            }
+                            with yt_dlp.YoutubeDL(dl_opts) as ydl_dl:
+                                ydl_dl.download([active_url])
+                            
+                            if os.path.exists(out_file) and os.path.getsize(out_file) > 1000:
+                                with open(out_file, "rb") as f:
+                                    video_bytes = f.read()
+                                os.remove(out_file)
+                                st.download_button(
+                                    label="💾 Click here to save file now",
+                                    data=video_bytes,
+                                    file_name=filename,
+                                    mime="video/mp4",
+                                    use_container_width=True
+                                )
+                                st.success("File ready! Click the save button above.")
+                            else:
+                                st.error("Download failed or file is empty.")
+                        except Exception as e:
+                            st.error(f"Download error: {e}")
+            else:
+                st.error("The media link could not be processed.")
+
+        except Exception as ex:
+            st.error(f"Extraction error: {ex}")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
