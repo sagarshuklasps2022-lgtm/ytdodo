@@ -130,7 +130,7 @@
             <div id="player-section" class="hidden space-y-4 pt-3 border-t border-gray-800">
                 <div class="bg-[#1f242d] border border-gray-800 rounded-t-xl px-4 py-3 flex items-center space-x-2">
                     <span class="text-base">🎵</span>
-                    <p id="media-title" class="text-sm font-bold text-white truncate">Loading video title...</p>
+                    <p id="media-title" class="text-sm font-bold text-white truncate">YT Dodo Media Stream</p>
                 </div>
                 
                 <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative">
@@ -161,56 +161,37 @@
     </footer>
 
     <script>
-        let fetchedVideoId = "";
-        let fetchedTitle = "";
+        function extractVideoId(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
 
-        async function handleSearch() {
+        function handleSearch() {
             const urlInput = document.getElementById('target-url').value;
-            if(!urlInput) {
-                alert("Please paste a link first!");
+            const videoId = extractVideoId(urlInput);
+
+            if(!videoId) {
+                alert("Please enter a valid YouTube link!");
                 return;
             }
 
-            const searchBtn = document.getElementById('search-btn');
-            searchBtn.innerText = "Fetching Video Title...";
-            searchBtn.disabled = true;
-
+            // Set hidden form input for final download
             document.getElementById('hidden-download-url').value = urlInput;
 
+            // Mock ad link
             const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
             document.getElementById('shrink-ad-link').href = mockShrinkUrl;
-
-            try {
-                const response = await fetch('/get-video-info', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url: urlInput })
-                });
-                const data = await response.json();
-                
-                if(data.video_id) {
-                    fetchedVideoId = data.video_id;
-                    fetchedTitle = data.title;
-                    searchBtn.innerText = "Search";
-                    searchBtn.disabled = false;
-                    document.getElementById('review-section').classList.remove('hidden');
-                } else {
-                    alert("Could not fetch video info. Please try another link.");
-                    searchBtn.innerText = "Search";
-                    searchBtn.disabled = false;
-                }
-            } catch(err) {
-                console.error("Error:", err);
-                alert("Server connection error!");
-                searchBtn.innerText = "Search";
-                searchBtn.disabled = false;
-            }
+            document.getElementById('review-section').classList.remove('hidden');
         }
 
         function showMediaPlayer() {
-            if(fetchedVideoId) {
-                document.getElementById('media-title').innerText = fetchedTitle;
-                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + fetchedVideoId + "?autoplay=1&controls=1&modestbranding=1&rel=0";
+            const urlInput = document.getElementById('target-url').value;
+            const videoId = extractVideoId(urlInput);
+
+            if(videoId) {
+                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + videoId + "?autoplay=1&controls=1&modestbranding=1&rel=0";
+                document.getElementById('media-title').innerText = "Playing YouTube Video (ID: " + videoId + ")";
             }
             document.getElementById('player-section').classList.remove('hidden');
             document.getElementById('player-section').scrollIntoView({ behavior: 'smooth' });
