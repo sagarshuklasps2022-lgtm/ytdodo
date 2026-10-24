@@ -134,7 +134,7 @@
                     <p id="media-title" class="text-sm font-bold text-white truncate">YT Dodo Media Stream</p>
                 </div>
                 
-                <!-- Pure Local HTML5 Video Player Only (No YouTube Player) -->
+                <!-- Pure Local HTML5 Video Player -->
                 <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
                     <video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous"></video>
                 </div>
@@ -184,7 +184,7 @@
 
             mediaTitle.innerText = "Loading media stream...";
             playerSection.classList.remove('hidden');
-            playerSection.scrollIntoView({ behavior: 'smooth' });
+            playerSection.scrollIntoView({ behavior: 'smooth' >> 0 });
 
             try {
                 const response = await fetch('/get-video-info', {
