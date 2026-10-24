@@ -380,7 +380,6 @@ else:
 
     if st.button("Search & Prepare Download", use_container_width=True) and target_url:
         try:
-            # Bulletproof extraction settings using Android/Web client bypass
             if "MP3" in format_type.upper():
                 ydl_opts = {
                     "format": "bestaudio/best",
@@ -402,7 +401,7 @@ else:
                 info = ydl.extract_info(target_url, download=False)
                 direct_url = info.get("url")
                 thumbnail = info.get("thumbnail")
-                title = info.get("title", "Media Video")
+                title = info.get("title", "Media_Video")
 
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
@@ -413,15 +412,19 @@ else:
                 if thumbnail:
                     st.image(thumbnail, caption=f"📹 {title}", use_container_width=True)
                 
+                # Clean filename generator for safe download naming
+                safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
+                filename = f"{safe_title}.mp4"
+                
                 # Monetized Download Button
                 st.markdown(
-                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download</a>',
+                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download (Via Ad Link)</a>',
                     unsafe_allow_html=True,
                 )
                 
-                # Direct Download Button Alternative
+                # Direct Download Button Alternative with Correct Video Title as Filename
                 st.markdown(
-                    f'<a href="{direct_url}" download="ytdodo_media.mp4" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download (Alternative)</a>',
+                    f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:35]}...)</a>',
                     unsafe_allow_html=True,
                 )
             else:
