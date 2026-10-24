@@ -411,10 +411,11 @@ else:
                 safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
                 filename = f"{safe_title}.mp4"
                 
-                # Video Player Display with Exact Video Title on Top
+                # Video Player Display with Exact Video Title Header on Top
                 st.markdown(f"""
-                    <div style="background:#1f242d; padding:10px 15px; border-radius:10px 10px 0 0; border:1px solid {border_color}; border-bottom:none;">
-                        <p style="color:#ffffff; font-size:14px; font-weight:bold; margin:0;">▶ {title}</p>
+                    <div style="background:#1f242d; padding:12px 18px; border-radius:12px 12px 0 0; border:1px solid {border_color}; border-bottom:none; display:flex; align-items:center; gap:10px;">
+                        <span style="font-size:18px;">🎵</span>
+                        <p style="color:#ffffff; font-size:15px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
                     </div>
                 """, unsafe_allow_html=True)
                 st.video(direct_url)
@@ -425,7 +426,7 @@ else:
                     unsafe_allow_html=True,
                 )
                 
-                # Direct Video Download Button with Exact Title
+                # Direct Stream Downloader link with proper filename attribute
                 st.markdown(
                     f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:40]}...)</a>',
                     unsafe_allow_html=True,
