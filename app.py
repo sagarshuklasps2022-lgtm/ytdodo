@@ -151,6 +151,16 @@ st.markdown("""
         transform: translateY(-4px);
         box-shadow: 0 12px 25px rgba(220, 38, 38, 0.4), inset 0 1px 2px rgba(255,255,255,0.2);
     }
+    .sponsored-banner {
+        background: linear-gradient(135deg, #1f2937, #111827);
+        border: 1px dashed #dc2626;
+        padding: 14px;
+        border-radius: 14px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #fca5a5;
+    }
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-20px); }
         to { opacity: 1; transform: translateY(0); }
@@ -333,6 +343,13 @@ else:
         st.session_state.current_user = ""
         st.rerun()
 
+    # Sponsored Banner Ad matching VidMate interface
+    st.markdown("""
+        <div class="sponsored-banner">
+            📢 <b>SPONSORED:</b> Play Free Games & Win Big Rewards on YT Dodo Hub! <a href="https://shrinkme.io" target="_blank" style="color:#ef4444; font-weight:bold;">INSTALL NOW</a>
+        </div>
+    """, unsafe_allow_html=True)
+
     # Enhanced 3D Quick Shortcuts Section
     st.markdown("""
         <div class="card-box" style="padding-bottom: 15px;">
@@ -372,27 +389,6 @@ else:
         st.markdown('<a href="https://m.uptodown.com/android" target="_blank" class="shortcut-btn">📥 TubeMate APK</a>', unsafe_allow_html=True)
     with apk_c3:
         st.markdown('<a href="https://m.uptodown.com/android" target="_blank" class="shortcut-btn">📥 GB WhatsApp</a>', unsafe_allow_html=True)
-
-    # --- NEW: WhatsApp Status & Instagram/Facebook Stories & Highlights Quick Downloader Section ---
-    st.markdown("""
-        <div class="card-box">
-            <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">📱 WhatsApp Status & IG/FB Stories / Highlights Saver</h3>
-            <p style="color: #9ca3af; font-size: 12px; margin-bottom: 15px;">
-                Since direct status links are hidden by social apps, use this dedicated section to view/extract or upload saved story files for instant watermark-free downloading:
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
-
-    status_file = st.file_uploader("Upload WhatsApp Status / Story Media (.mp4 or .jpg) from your phone gallery", type=["mp4", "jpg", "png", "jpeg"])
-    if status_file is not None:
-        st.success("Media successfully loaded from your device!")
-        st.image(status_file, caption="Loaded Status Preview", use_container_width=True) if "jpg" in status_file.name or "png" in status_file.name else st.video(status_file)
-        
-        # Monetized Download Button for Uploaded Status
-        st.markdown(
-            f'<a href="#" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 10px;">📥 Download Clean Status (Watermark-Free)</a>',
-            unsafe_allow_html=True,
-        )
 
     # --- Search & Download Hub (Universal Video & Reels) ---
     st.markdown("""
