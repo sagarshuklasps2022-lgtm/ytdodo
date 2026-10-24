@@ -40,7 +40,7 @@ def get_video_info():
             
             if not stream_url and 'formats' in info:
                 for f in info['formats']:
-                    if f.get('url') and f.get('vcodec') != 'none' and f.get('ext'] == 'mp4':
+                    if f.get('url') and f.get('vcodec') != 'none' and f.get('ext') == 'mp4':
                         stream_url = f['url']
                         break
                 if not stream_url:
