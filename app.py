@@ -119,7 +119,7 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- DIRECT DASHBOARD (NO LOGIN REQUIRED) ---
+# --- DIRECT DASHBOARD ---
 st.markdown(f"""
     <div class="main-header">
         <div style="display: flex; align-items: center; gap: 14px;">
@@ -162,7 +162,7 @@ with c4:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- Search & Download Hub (Universal Video & Reels) ---
+# --- Search & Download Hub ---
 st.markdown(f"""
     <div class="card-box" style="margin-top: 25px;">
         <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px;">🔍 Universal Video & Media Downloader</h3>
