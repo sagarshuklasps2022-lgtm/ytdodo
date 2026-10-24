@@ -188,7 +188,7 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             "nocheckcertificate": True,
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["ios", "tv_embedded", "web"]
+                    "player_client": ["android", "web", "mweb"]
                 }
             },
         }
@@ -197,44 +197,40 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             info = ydl.extract_info(active_url, download=False)
             direct_url = info.get("url")
             title = info.get("title", "YT Dodo Media Stream")
+            
+            # Agar direct url na mile toh formats me se search karo
+            if not direct_url and 'formats' in info:
+                for f in info['formats']:
+                    if f.get('url') and f.get('vcodec') != 'none':
+                        direct_url = f['url']
+                        break
 
-        # Fallback agar direct link na mile toh sample video load kar do taaki player khali na rahe
-        if not direct_url:
-            direct_url = "https://www.w3schools.com/html/mov_bbb.mp4"
-            title = "YT Dodo Media Hub (Stream Ready)"
-
-        shortened_url = shorten_with_shrinkme(active_url)
-        
-        st.success("Media Ready for Local Player Stream!")
-        
-        # Video Title Header
-        st.markdown(f"""
-            <div style="background:#1f242d; padding:12px 16px; border-radius:12px 12px 0 0; border:1px solid #30363d; border-bottom:none; display:flex; align-items:center; gap:10px;">
-                <span style="font-size:16px;">🎵</span>
-                <p style="color:#ffffff; font-size:14px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Streamlit Native Local Player (No YouTube iframe used)
-        st.video(direct_url)
-        
-        # Download Button linked with ShrinkMe Ad
-        st.markdown(
-            f'<a href="{shortened_url}" target="_blank" style="display:block;padding:15px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); margin-top: 15px;">Download Now</a>',
-            unsafe_allow_html=True,
-        )
+        if direct_url:
+            shortened_url = shorten_with_shrinkme(active_url)
+            
+            st.success("Media Ready for Local Player Stream!")
+            
+            # Video Title Header
+            st.markdown(f"""
+                <div style="background:#1f242d; padding:12px 16px; border-radius:12px 12px 0 0; border:1px solid #30363d; border-bottom:none; display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:16px;">🎵</span>
+                    <p style="color:#ffffff; font-size:14px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Streamlit Native Local Player
+            st.video(direct_url)
+            
+            # Download Button linked with ShrinkMe Ad
+            st.markdown(
+                f'<a href="{shortened_url}" target="_blank" style="display:block;padding:15px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); margin-top: 15px;">Download Now</a>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.error("YouTube restricted this video link. Try another video link.")
 
     except Exception as ex:
-        # Fallback player agar extraction fail ho jaye
-        fallback_url = "https://www.w3schools.com/html/mov_bbb.mp4"
-        shortened_url = shorten_with_shrinkme(st.session_state.saved_target_url)
-        
-        st.warning("Direct stream restricted by YouTube. Using secure stream player below:")
-        st.video(fallback_url)
-        st.markdown(
-            f'<a href="{shortened_url}" target="_blank" style="display:block;padding:15px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); margin-top: 15px;">Download Now</a>',
-            unsafe_allow_html=True,
-        )
+        st.error(f"Extraction error: {ex}")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
