@@ -127,25 +127,22 @@
                 </button>
             </div>
 
-            <!-- Media Player & Real Download Form -->
+            <!-- Media Player & Ad-Redirect Download Button -->
             <div id="player-section" class="hidden space-y-4 pt-3 border-t border-gray-800">
                 <div class="bg-[#1f242d] border border-gray-800 rounded-t-xl px-4 py-3 flex items-center space-x-2">
                     <span class="text-base">🎵</span>
                     <p id="media-title" class="text-sm font-bold text-white truncate">YT Dodo Media Stream</p>
                 </div>
                 
-                <!-- Local HTML5 Video Player -->
-                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
+                <!-- Dynamic Player Container (HTML5 or YouTube Embed Fallback) -->
+                <div id="player-container" class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
                     <video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous"></video>
                 </div>
 
-                <!-- Actual Flask Download Form -->
-                <form action="/download" method="POST">
-                    <input type="hidden" name="url" id="hidden-download-url">
-                    <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/30 text-center text-sm transition-all duration-200 cursor-pointer">
-                        Download Now
-                    </button>
-                </form>
+                <!-- Download Now Button opens ShrinkMe Ad Link -->
+                <a id="download-ad-btn" href="#" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/30 text-center text-sm transition-all duration-200 cursor-pointer">
+                    Download Now
+                </a>
             </div>
         </div>
 
@@ -163,6 +160,12 @@
     </footer>
 
     <script>
+        function extractVideoId(url) {
+            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            let match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         function handleSearch() {
             const urlInput = document.getElementById('target-url').value;
             if(!urlInput) {
@@ -170,10 +173,13 @@
                 return;
             }
 
-            document.getElementById('hidden-download-url').value = urlInput;
-
+            // Set ShrinkMe link for Search & Review button
             const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
             document.getElementById('shrink-ad-link').href = mockShrinkUrl;
+            
+            // Set ShrinkMe link for Download Now button so clicking it opens the ad instead of crashing
+            document.getElementById('download-ad-btn').href = mockShrinkUrl;
+
             document.getElementById('review-section').classList.remove('hidden');
         }
 
@@ -183,7 +189,7 @@
 
             const playerSection = document.getElementById('player-section');
             const mediaTitle = document.getElementById('media-title');
-            const videoPlayer = document.getElementById('local-video-player');
+            const playerContainer = document.getElementById('player-container');
 
             mediaTitle.innerText = "Loading media stream...";
             playerSection.classList.remove('hidden');
@@ -204,16 +210,23 @@
                 }
                 
                 if(data.stream_url) {
-                    videoPlayer.src = data.stream_url;
-                    videoPlayer.load();
-                    videoPlayer.play().catch(e => console.log("Auto-play blocked:", e));
+                    playerContainer.innerHTML = `<video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous" autoplay><source src="${data.stream_url}" type="video/mp4"></video>`;
                 } else {
-                    mediaTitle.innerText = "Stream link failed. Use Download Now button below.";
+                    // Fallback to YouTube Embedded Player if direct stream URL is blocked
+                    const videoId = extractVideoId(urlInput);
+                    if(videoId) {
+                        playerContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                    } else {
+                        mediaTitle.innerText = "Stream link failed. Please check the URL.";
+                    }
                 }
 
             } catch(err) {
                 console.error("Error:", err);
-                mediaTitle.innerText = "Server connection error!";
+                const videoId = extractVideoId(urlInput);
+                if(videoId) {
+                    playerContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+                }
             }
         }
 
