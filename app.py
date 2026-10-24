@@ -27,11 +27,11 @@ def get_video_info():
             "nocheckcertificate": True,
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android", "ios", "web"]
+                    "player_client": ["android", "web"]
                 }
             },
             "http_headers": {
-                "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Accept-Language": "en-US,en;q=0.9",
             },
             'skip_download': True,
@@ -44,9 +44,15 @@ def get_video_info():
             
             if not stream_url and 'formats' in info:
                 for f in info['formats']:
-                    if f.get('url') and f.get('vcodec') != 'none':
+                    if f.get('url') and f.get('vcodec') != 'none' and f.get('ext') == 'mp4':
                         stream_url = f['url']
                         break
+                # Agar mp4 na mile toh koi bhi working vcodec utha lo
+                if not stream_url:
+                    for f in info['formats']:
+                        if f.get('url') and f.get('vcodec') != 'none':
+                            stream_url = f['url']
+                            break
 
             return jsonify({
                 'title': title, 
@@ -55,7 +61,7 @@ def get_video_info():
     except Exception as e:
         return jsonify({
             'title': 'YT Dodo Media Stream', 
-            'stream_url': url
+            'stream_url': ''
         }), 200
 
 @app.route('/download', methods=['POST'])
@@ -72,18 +78,18 @@ def download():
             "nocheckcertificate": True,
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android", "ios", "web"]
+                    "player_client": ["android", "web"]
                 }
             },
             "http_headers": {
-                "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Accept-Language": "en-US,en;q=0.9",
             },
             'outtmpl': os.path.join(DOWNLOAD_FOLDER, '%(title)s.%(ext)s'),
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=True)
+            info = yt_dlp.YoutubeDL(ydl_opts).extract_info(url, download=True)
             filename = ydl.prepare_filename(info)
             
         return send_file(filename, as_attachment=True)
