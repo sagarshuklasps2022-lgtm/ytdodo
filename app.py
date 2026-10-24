@@ -172,7 +172,6 @@ if not st.session_state.logged_in:
     st.markdown('<p class="login-header">YT DODO APP</p>', unsafe_allow_html=True)
     st.markdown('<p class="login-subheader">Universal Video & Media Downloader</p>', unsafe_allow_html=True)
     
-    # Feature Highlights Box matching Reference Image 1
     st.markdown("""
         <div class="feature-box">
             <span>⚡ Ultra Fast</span>
@@ -315,7 +314,7 @@ else:
                     "nocheckcertificate": True,
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
-                        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
                         "Accept-Language": "en-US,en;q=0.9",
                     }
                 }
@@ -327,7 +326,7 @@ else:
                     "nocheckcertificate": True,
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
-                        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
                         "Accept-Language": "en-US,en;q=0.9",
                     }
                 }
@@ -339,7 +338,7 @@ else:
                     "nocheckcertificate": True,
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
-                        "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
                         "Accept-Language": "en-US,en;q=0.9",
                     }
                 }
@@ -349,10 +348,9 @@ else:
                 direct_url = info.get("url")
 
             if direct_url:
-                # ShrinkMe Monetized Ad Link Integration
                 shortened_url = shorten_with_shrinkme(direct_url)
                 
-                st.success("YouTube Video Media Ready")
+                st.success("Media Ready for Download!")
                 
                 # First Button: Monetized Ad Link
                 st.markdown(
@@ -366,10 +364,11 @@ else:
                     unsafe_allow_html=True,
                 )
             else:
-                st.error("The download link could not be processed. Please verify the URL and try again.")
+                st.error("The media link could not be processed. Please verify the URL or try another public link.")
 
         except Exception as e:
-            st.error(f"Download failed: {e}")
+            # Smart Fallback Message for Instagram or Protected Reels restriction
+            st.error(f"Download restriction or empty response from platform. Please try another public link or direct source.")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
