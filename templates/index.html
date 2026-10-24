@@ -134,12 +134,12 @@
                     <p id="media-title" class="text-sm font-bold text-white truncate">YT Dodo Media Stream</p>
                 </div>
                 
-                <!-- Dynamic Player Container (HTML5 or YouTube Embed Fallback) -->
-                <div id="player-container" class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
+                <!-- Pure Local HTML5 Video Player (No YouTube Player) -->
+                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
                     <video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous"></video>
                 </div>
 
-                <!-- Download Now Button opens ShrinkMe Ad Link -->
+                <!-- Download Now Button opens ShrinkMe Ad Link for Earnings -->
                 <a id="download-ad-btn" href="#" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/30 text-center text-sm transition-all duration-200 cursor-pointer">
                     Download Now
                 </a>
@@ -160,12 +160,6 @@
     </footer>
 
     <script>
-        function extractVideoId(url) {
-            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            let match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
         function handleSearch() {
             const urlInput = document.getElementById('target-url').value;
             if(!urlInput) {
@@ -173,11 +167,8 @@
                 return;
             }
 
-            // Set ShrinkMe link for Search & Review button
             const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
             document.getElementById('shrink-ad-link').href = mockShrinkUrl;
-            
-            // Set ShrinkMe link for Download Now button so clicking it opens the ad instead of crashing
             document.getElementById('download-ad-btn').href = mockShrinkUrl;
 
             document.getElementById('review-section').classList.remove('hidden');
@@ -189,7 +180,7 @@
 
             const playerSection = document.getElementById('player-section');
             const mediaTitle = document.getElementById('media-title');
-            const playerContainer = document.getElementById('player-container');
+            const videoPlayer = document.getElementById('local-video-player');
 
             mediaTitle.innerText = "Loading media stream...";
             playerSection.classList.remove('hidden');
@@ -210,23 +201,16 @@
                 }
                 
                 if(data.stream_url) {
-                    playerContainer.innerHTML = `<video id="local-video-player" class="w-full h-full" controls crossorigin="anonymous" autoplay><source src="${data.stream_url}" type="video/mp4"></video>`;
+                    videoPlayer.src = data.stream_url;
+                    videoPlayer.load();
+                    videoPlayer.play().catch(e => console.log("Auto-play blocked:", e));
                 } else {
-                    // Fallback to YouTube Embedded Player if direct stream URL is blocked
-                    const videoId = extractVideoId(urlInput);
-                    if(videoId) {
-                        playerContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-                    } else {
-                        mediaTitle.innerText = "Stream link failed. Please check the URL.";
-                    }
+                    mediaTitle.innerText = "Could not fetch direct stream. Please try another link.";
                 }
 
             } catch(err) {
                 console.error("Error:", err);
-                const videoId = extractVideoId(urlInput);
-                if(videoId) {
-                    playerContainer.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
-                }
+                mediaTitle.innerText = "Server connection error!";
             }
         }
 
