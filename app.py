@@ -420,45 +420,17 @@ else:
                 """, unsafe_allow_html=True)
                 st.video(direct_url)
                 
-                # 1. Download Button (Via Ad Link)
+                # 1. Download Button (Via Ad Link / ShrinkMe)
                 st.markdown(
                     f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 15px; margin-bottom: 12px;">Download</a>',
                     unsafe_allow_html=True,
                 )
                 
-                # 2. Direct Video Download Button using robust yt_dlp direct streaming download handler
-                download_clicked = st.button("Direct Video Download", use_container_width=True)
-                if download_clicked:
-                    with st.spinner("Downloading media securely... Please wait."):
-                        try:
-                            # Server-side full download execution via yt_dlp to prevent file corruption
-                            out_template = os.path.join(os.getcwd(), f"{safe_title}.mp4")
-                            dl_opts = {
-                                "format": "best[ext=mp4]/best",
-                                "outtmpl": out_template,
-                                "noplaylist": True,
-                                "geo_bypass": True,
-                                "nocheckcertificate": True,
-                                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
-                            }
-                            with yt_dlp.YoutubeDL(dl_opts) as ydl_dl:
-                                ydl_dl.download([target_url])
-                            
-                            if os.path.exists(out_template):
-                                with open(out_template, "rb") as f:
-                                    file_bytes = f.read()
-                                st.download_button(
-                                    label="Click here to save file now",
-                                    data=file_bytes,
-                                    file_name=filename,
-                                    mime="video/mp4",
-                                    use_container_width=True
-                                )
-                                st.success("File prepared successfully! Click above to save.")
-                            else:
-                                st.error("Failed to generate download file.")
-                        except Exception as dlex:
-                            st.error(f"Download error: {dlex}")
+                # 2. Direct Video Download Button using HTML5 download attribute with absolute safety bypass
+                st.markdown(
+                    f'<a href="{direct_url}" download="{filename}" target="_self" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">Direct Video Download</a>',
+                    unsafe_allow_html=True,
+                )
             else:
                 st.error("The media link could not be processed.")
 
