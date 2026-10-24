@@ -13,7 +13,6 @@ st.set_page_config(
 
 # Robust Secure Session State Initialization for Users & Auth
 if "users_db" not in st.session_state:
-    # Format: {username: {"password": "...", "yt_dodo_id": "..."}}
     st.session_state.users_db = {"sagar": {"password": "Sagar@123", "yt_dodo_id": "YTDODO_463385"}}
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -197,14 +196,12 @@ if not st.session_state.logged_in:
         if st.session_state.auth_mode == "login":
             st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔐 Secure Sign In</h4>', unsafe_allow_html=True)
             
-            # Auto-fill remembered credentials if available
             default_user = st.session_state.remember_user if st.session_state.remember_user else ""
             default_pass = st.session_state.remember_pass if st.session_state.remember_pass else ""
 
             username_input = st.text_input("Username / YT Dodo ID", value=default_user, placeholder="user@ytdodo.app or YTDODO_xxxxxx")
             password_input = st.text_input("Password", value=default_pass, type="password", placeholder="••••••••")
             
-            # Sign-In monetized ad notification check if account was just created
             if st.session_state.new_account_created:
                 st.success("🎉 Account Created Successfully!")
                 shrink_dummy_url = shorten_with_shrinkme("https://ytdodo.app/welcome")
@@ -223,7 +220,6 @@ if not st.session_state.logged_in:
                     st.rerun()
 
             if st.button("Sign In", use_container_width=True):
-                # Check login against both regular username and unique YT Dodo ID
                 matched_user = None
                 for uname, udata in st.session_state.users_db.items():
                     if (uname.lower() == username_input.strip().lower() or udata["yt_dodo_id"].lower() == username_input.strip().lower()) and udata["password"] == password_input:
@@ -231,7 +227,6 @@ if not st.session_state.logged_in:
                         break
                 
                 if matched_user:
-                    # Monetized Ad link prompt during Sign In
                     shrink_signin_url = shorten_with_shrinkme(f"https://ytdodo.app/login?user={matched_user}")
                     st.markdown(
                         f'<div style="background:#1f242d; padding:15px; border-radius:12px; border:1px solid #dc2626; margin-bottom:15px;">'
@@ -277,11 +272,9 @@ if not st.session_state.logged_in:
                 elif new_pass != confirm_pass:
                     st.error("Passwords do not match!")
                 else:
-                    # Generate unique YT Dodo ID
                     unique_yt_id = f"YTDODO_{random.randint(100000, 999999)}"
                     st.session_state.users_db[new_user] = {"password": new_pass, "yt_dodo_id": unique_yt_id}
                     
-                    # Set pending state to prompt shrink verification on login page
                     st.session_state.pending_yt_id = unique_yt_id
                     st.session_state.pending_pass = new_pass
                     st.session_state.pending_user = new_user
@@ -375,7 +368,6 @@ else:
 
     if st.button("Search & Prepare Download", use_container_width=True) and target_url:
         try:
-            # Advanced Geo-bypass and Region Restriction handling for YouTube/Instagram
             if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
                 ydl_opts = {
                     "format": "bestaudio/best",
@@ -386,7 +378,9 @@ else:
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                        "Accept-Language": "en-US,en;q=0.9",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "en-US,en;q=0.5",
+                        "Sec-Fetch-Mode": "navigate",
                     }
                 }
             elif "1080" in format_type:
@@ -399,12 +393,14 @@ else:
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                        "Accept-Language": "en-US,en;q=0.9",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "en-US,en;q=0.5",
+                        "Sec-Fetch-Mode": "navigate",
                     }
                 }
             else:
                 ydl_opts = {
-                    "format": "best[height<=720][ext=mp4]/best[height<=720]/best",
+                    "format": "best[ext=mp4]/best",
                     "noplaylist": True,
                     "geo_bypass": True,
                     "geo_bypass_country": "US",
@@ -412,7 +408,9 @@ else:
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                        "Accept-Language": "en-US,en;q=0.9",
+                        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                        "Accept-Language": "en-US,en;q=0.5",
+                        "Sec-Fetch-Mode": "navigate",
                     }
                 }
 
@@ -423,24 +421,24 @@ else:
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
                 
-                st.success("Media Ready for Download!")
+         st.success("Media Ready for Download!")
                 
-                # First Button: Renamed cleanly to "Download" as requested for revenue/ads
+                # First Button: Renamed cleanly to "Download" for monetization/ads
                 st.markdown(
                     f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download</a>',
                     unsafe_allow_html=True,
                 )
                 
-                # Second Button: Direct Video Download Alternative for actual direct file saving
+                # Second Button: Direct Download with download attribute to force browser saving
                 st.markdown(
-                    f'<a href="{direct_url}" target="_blank" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download (Alternative)</a>',
+                    f'<a href="{direct_url}" download="ytdodo_video.mp4" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download (Alternative)</a>',
                     unsafe_allow_html=True,
                 )
             else:
-                st.error("The media link could not be processed due to country or region restriction. Please try another public link.")
+                st.error("The media link could not be processed. Please verify the URL or try another public link.")
 
         except Exception as e:
-            st.error(f"Geo-restriction or extraction error encountered: {e}. Please try another public video link.")
+            st.error(f"Extraction error or restriction encountered: {e}. Please try another public video link.")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -456,4 +454,4 @@ else:
 
 # Final Footer for all screens
 st.markdown("<hr style='border-color: #30363d; margin-top: 40px;'>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: gray; font-size: 11px;'>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: gray; font-size: 11px;'>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html
