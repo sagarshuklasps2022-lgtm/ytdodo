@@ -98,7 +98,7 @@ st.markdown("""
             <a href="https://shrinkme.io" target="_blank" style="font-weight: bold; color: #ef4444; text-decoration: underline; margin-left: 0.25rem;">INSTALL NOW</a>
         </div>
 
-        <!-- Quick Platforms & Shortcuts Section with Exact HTML Grid and SVGs -->
+        <!-- Quick Platforms & Shortcuts Section -->
         <div style="background-color: rgba(19, 24, 34, 0.95); backdrop-filter: blur(12px); border: 1px solid #1f2937; padding: 1.25rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);">
             <p style="font-size: 0.75rem; font-weight: bold; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.375rem;">
                 <span>🚀</span> Quick Platforms & Shortcuts
