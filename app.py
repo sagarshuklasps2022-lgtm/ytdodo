@@ -20,7 +20,6 @@ def get_video_info():
         return jsonify({'error': 'URL missing'}), 400
     
     try:
-        # YouTube बॉट प्रोटेक्शन से बचने के लिए एंड्रॉइड/वेब क्लाइंट सिमुलेशन
         ydl_opts = {
             'extractor-args': {'youtube': {'player-client': ['android', 'web']}},
             'skip_download': True,
@@ -28,14 +27,8 @@ def get_video_info():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             title = info.get('title', 'YT Dodo Media Stream')
-            
-            # वीडियो का डायरेक्ट प्लेबल लिंक या एम्बेड आईडी निकालना
             vid_id = info.get('id', '')
-            
-            return jsonify({
-                'title': title, 
-                'video_id': vid_id
-            })
+            return jsonify({'title': title, 'video_id': vid_id})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
