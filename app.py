@@ -23,11 +23,11 @@ def get_video_info():
             "nocheckcertificate": True,
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android", "ios", "web"]
+                    "player_client": ["android_vr", "android", "web"]
                 }
             },
             "http_headers": {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
                 "Accept-Language": "en-US,en;q=0.9",
             },
             'skip_download': True,
@@ -38,7 +38,6 @@ def get_video_info():
             title = info.get('title', 'YT Dodo Media Stream')
             stream_url = info.get('url', '')
             
-            # अगर डायरेक्ट यूआरएल न मिले तो formats लिस्ट से mp4 ढूंढना
             if not stream_url and 'formats' in info:
                 for f in info['formats']:
                     if f.get('url') and f.get('vcodec') != 'none' and f.get('ext') == 'mp4':
