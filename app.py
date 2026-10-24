@@ -380,7 +380,7 @@ else:
 
     if st.button("Search & Prepare Download", use_container_width=True) and target_url:
         try:
-            # Safe and robust format handling to prevent "Requested format is not available" error
+            # Fully robust error-free fallback formatting to prevent any 'Requested format is not available' error
             if "MP3" in format_type.upper():
                 ydl_opts = {
                     "format": "bestaudio/best",
@@ -390,7 +390,7 @@ else:
                 }
             else:
                 ydl_opts = {
-                    "format": "best[ext=mp4]/best",
+                    "format": "best/bestvideo+bestaudio/best",
                     "noplaylist": True,
                     "geo_bypass": True,
                     "nocheckcertificate": True,
@@ -430,7 +430,7 @@ else:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Active Downloads Status Box restored
+    # Active Downloads Status Box
     st.markdown("""
         <div class="card-box">
             <h4 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">📁 Gallery & Active Downloads Status: Ready to manage your downloaded media</h4>
