@@ -2,6 +2,7 @@ import os
 import streamlit as st
 import yt_dlp
 import requests
+import random
 
 # Page configuration
 st.set_page_config(
@@ -12,15 +13,28 @@ st.set_page_config(
 
 # Robust Secure Session State Initialization for Users & Auth
 if "users_db" not in st.session_state:
-    st.session_state.users_db = {"sagar": "Sagar@123"}
+    # Format: {username: {"password": "...", "yt_dodo_id": "..."}}
+    st.session_state.users_db = {"sagar": {"password": "Sagar@123", "yt_dodo_id": "YTDODO_463385"}}
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "auth_mode" not in st.session_state:
     st.session_state.auth_mode = "login"
 if "current_user" not in st.session_state:
     st.session_state.current_user = ""
+if "remember_user" not in st.session_state:
+    st.session_state.remember_user = ""
+if "remember_pass" not in st.session_state:
+    st.session_state.remember_pass = ""
+if "new_account_created" not in st.session_state:
+    st.session_state.new_account_created = False
+if "pending_yt_id" not in st.session_state:
+    st.session_state.pending_yt_id = ""
+if "pending_pass" not in st.session_state:
+    st.session_state.pending_pass = ""
+if "pending_user" not in st.session_state:
+    st.session_state.pending_user = ""
 
-# Professional 3D Dark Theme Custom CSS & UI Styling matching Reference Images
+# Professional 3D Dark Theme Custom CSS & UI Styling
 st.markdown("""
     <style>
     .stApp {
@@ -28,7 +42,6 @@ st.markdown("""
         color: #ffffff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    /* --- LOGIN & BANNER UI --- */
     .login-container {
         background: #131822;
         padding: 30px;
@@ -99,7 +112,6 @@ st.markdown("""
         box-shadow: 0 8px 20px rgba(220, 38, 38, 0.6);
         transform: translateY(-2px);
     }
-    /* --- DASHBOARD UI --- */
     .main-header {
         background: linear-gradient(145deg, #131822, #0e121b);
         padding: 20px;
@@ -165,7 +177,7 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- SECURE AUTHENTICATION & BANNER SECTION (RESTRICTED ACCESS) ---
+# --- SECURE AUTHENTICATION & REGISTRATION FLOW ---
 if not st.session_state.logged_in:
     st.markdown('<div class="login-container">', unsafe_allow_html=True)
     st.markdown('<span class="banner-badge">👑 NEXT-GEN MEDIA DOWNLOADER</span>', unsafe_allow_html=True)
@@ -184,18 +196,63 @@ if not st.session_state.logged_in:
     with col2:
         if st.session_state.auth_mode == "login":
             st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔐 Secure Sign In</h4>', unsafe_allow_html=True)
-            username_input = st.text_input("Username or Email", placeholder="user@ytdodo.app")
-            password_input = st.text_input("Password", type="password", placeholder="••••••••")
             
+            # Auto-fill remembered credentials if available
+            default_user = st.session_state.remember_user if st.session_state.remember_user else ""
+            default_pass = st.session_state.remember_pass if st.session_state.remember_pass else ""
+
+            username_input = st.text_input("Username / YT Dodo ID", value=default_user, placeholder="user@ytdodo.app or YTDODO_xxxxxx")
+            password_input = st.text_input("Password", value=default_pass, type="password", placeholder="••••••••")
+            
+            # Sign-In monetized ad notification check if account was just created
+            if st.session_state.new_account_created:
+                st.success("🎉 Account Created Successfully!")
+                shrink_dummy_url = shorten_with_shrinkme("https://ytdodo.app/welcome")
+                st.markdown(
+                    f'<div style="background:#1f242d; padding:15px; border-radius:12px; border:1px solid #dc2626; margin-bottom:15px;">'
+                    f'<p style="color:#ffffff; font-size:12px; margin-bottom:8px;"><b>✨ Your Unique YT Dodo ID:</b> <span style="color:#f87171;">{st.session_state.pending_yt_id}</span></p>'
+                    f'<p style="color:#9ca3af; font-size:11px; margin-bottom:10px;">Click below to verify your account & activate full download speed via secure link:</p>'
+                    f'<a href="{shrink_dummy_url}" target="_blank" style="display:block;padding:12px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;font-size:13px;">🔗 Activate Account via Secure Ad Link</a>'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+                if st.button("I have clicked & verified! Proceed to Auto-Fill & Login"):
+                    st.session_state.remember_user = st.session_state.pending_yt_id
+                    st.session_state.remember_pass = st.session_state.pending_pass
+                    st.session_state.new_account_created = False
+                    st.rerun()
+
             if st.button("Sign In", use_container_width=True):
-                if username_input in st.session_state.users_db and st.session_state.users_db[username_input] == password_input:
+                # Check login against both regular username and unique YT Dodo ID
+                matched_user = None
+                for uname, udata in st.session_state.users_db.items():
+                    if (uname.lower() == username_input.strip().lower() or udata["yt_dodo_id"].lower() == username_input.strip().lower()) and udata["password"] == password_input:
+                        matched_user = uname
+                        break
+                
+                if matched_user:
+                    # Monetized Ad link prompt during Sign In
+                    shrink_signin_url = shorten_with_shrinkme(f"https://ytdodo.app/login?user={matched_user}")
+                    st.markdown(
+                        f'<div style="background:#1f242d; padding:15px; border-radius:12px; border:1px solid #dc2626; margin-bottom:15px;">'
+                        f'<p style="color:#ffffff; font-size:12px; margin-bottom:8px;"><b>🔒 Security Checkpoint:</b> Verified ID: <code>{st.session_state.users_db[matched_user]["yt_dodo_id"]}</code></p>'
+                        f'<a href="{shrink_signin_url}" target="_blank" style="display:block;padding:12px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:8px;font-weight:bold;text-align:center;font-size:13px;">🚀 Click Here to Proceed to Dashboard</a>'
+                        f'</div>',
+                        unsafe_allow_html=True
+                    )
                     st.session_state.logged_in = True
-                    st.session_state.current_user = username_input
-                    st.success("Login Successful!")
+                    st.session_state.current_user = matched_user
+                    st.session_state.remember_user = username_input
+                    st.session_state.remember_pass = password_input
+                else:
+                    st.error("Invalid Credentials! Please check your username/YT ID or password.")
+            
+            if st.button("Go to Dashboard Directly (After Ad Click)", use_container_width=True):
+                if st.session_state.logged_in:
                     st.rerun()
                 else:
-                    st.error("Invalid Credentials! Please check your username or password.")
-            
+                    st.warning("Please complete sign in above.")
+
             col_a, col_b = st.columns(2)
             with col_a:
                 if st.button("Create New Account"):
@@ -212,7 +269,7 @@ if not st.session_state.logged_in:
             new_pass = st.text_input("Create Password", type="password", placeholder="••••••••")
             confirm_pass = st.text_input("Confirm Password", type="password", placeholder="••••••••")
             
-            if st.button("Register & Sign In", use_container_width=True):
+            if st.button("Register Account", use_container_width=True):
                 if not new_user or not new_pass:
                     st.error("Please fill all details.")
                 elif new_user in st.session_state.users_db:
@@ -220,10 +277,16 @@ if not st.session_state.logged_in:
                 elif new_pass != confirm_pass:
                     st.error("Passwords do not match!")
                 else:
-                    st.session_state.users_db[new_user] = new_pass
-                    st.session_state.logged_in = True
-                    st.session_state.current_user = new_user
-                    st.success("Account created successfully! Logging in...")
+                    # Generate unique YT Dodo ID
+                    unique_yt_id = f"YTDODO_{random.randint(100000, 999999)}"
+                    st.session_state.users_db[new_user] = {"password": new_pass, "yt_dodo_id": unique_yt_id}
+                    
+                    # Set pending state to prompt shrink verification on login page
+                    st.session_state.pending_yt_id = unique_yt_id
+                    st.session_state.pending_pass = new_pass
+                    st.session_state.pending_user = new_user
+                    st.session_state.new_account_created = True
+                    st.session_state.auth_mode = "login"
                     st.rerun()
             
             if st.button("Back to Sign In", use_container_width=True):
@@ -232,13 +295,17 @@ if not st.session_state.logged_in:
 
         elif st.session_state.auth_mode == "forgot":
             st.markdown('<h4 style="text-align: left; color: #ff0000; font-size: 16px;">🔄 Recover Password</h4>', unsafe_allow_html=True)
-            recovery_user = st.text_input("Enter your Username")
+            recovery_user = st.text_input("Enter your Username or YT Dodo ID")
             
-            if st.button("Fetch Password", use_container_width=True):
-                if recovery_user in st.session_state.users_db:
-                    st.info(f"Account Found! Your Password is: {st.session_state.users_db[recovery_user]}")
-                else:
-                    st.error("Username not found in database.")
+            if st.button("Fetch Account Details", use_container_width=True):
+                found = False
+                for uname, udata in st.session_state.users_db.items():
+                    if uname.lower() == recovery_user.strip().lower() or udata["yt_dodo_id"].lower() == recovery_user.strip().lower():
+                        st.info(f"Account Found! Username: {uname} | YT ID: {udata['yt_dodo_id']} | Password: {udata['password']}")
+                        found = True
+                        break
+                if not found:
+                    st.error("User or YT Dodo ID not found in database.")
             
             if st.button("Back to Sign In", use_container_width=True):
                 st.session_state.auth_mode = "login"
@@ -249,6 +316,8 @@ if not st.session_state.logged_in:
 
 else:
     # --- MAIN PROFESSIONAL 3D DARK THEME DASHBOARD (VISIBLE ONLY AFTER LOGIN) ---
+    current_uid = st.session_state.users_db.get(st.session_state.current_user, {}).get("yt_dodo_id", "YTDODO_PRO")
+    
     st.markdown(f"""
         <div class="main-header">
             <div style="display: flex; align-items: center; gap: 14px;">
@@ -257,7 +326,7 @@ else:
                 </div>
                 <div>
                     <h3 style="color: white; font-weight: bold; font-size: 17px; margin: 0; letter-spacing: 0.5px;">YT DODO</h3>
-                    <p style="color: #9ca3af; font-size: 11px; margin: 0;">Welcome, {st.session_state.current_user.capitalize()}</p>
+                    <p style="color: #9ca3af; font-size: 11px; margin: 0;">Welcome, {st.session_state.current_user.capitalize()} | ID: <code>{current_uid}</code></p>
                 </div>
             </div>
             <div style="display: flex; gap: 10px;">
@@ -271,7 +340,7 @@ else:
         st.session_state.current_user = ""
         st.rerun()
 
-    # Quick Shortcuts Section matching Reference Image 3
+    # Quick Shortcuts Section
     st.markdown("""
         <div class="card-box" style="padding-bottom: 15px;">
             <p style="color: #9ca3af; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Quick Platforms & Shortcuts: Access YouTube, Insta & Google in 1-Click</p>
@@ -295,7 +364,7 @@ else:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Search & Download Hub matching Reference Image 4
+    # Search & Download Hub with Region/Country Error Handling & Geo-Bypass
     st.markdown("""
         <div class="card-box">
             <h3 style="color: #dc2626; font-size: 15px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">🔍 Paste any Video Link or Search Songs/Videos here! (Monetized)</h3>
@@ -306,11 +375,13 @@ else:
 
     if st.button("Search & Prepare Download", use_container_width=True) and target_url:
         try:
+            # Advanced Geo-bypass and Region Restriction handling for YouTube/Instagram
             if "MP3" in format_type.upper() or "AUDIO" in format_type.upper():
                 ydl_opts = {
                     "format": "bestaudio/best",
                     "noplaylist": True,
                     "geo_bypass": True,
+                    "geo_bypass_country": "US",
                     "nocheckcertificate": True,
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
@@ -323,6 +394,7 @@ else:
                     "format": "best[height<=1080][ext=mp4]/best[height<=1080]/best",
                     "noplaylist": True,
                     "geo_bypass": True,
+                    "geo_bypass_country": "US",
                     "nocheckcertificate": True,
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
@@ -335,6 +407,7 @@ else:
                     "format": "best[height<=720][ext=mp4]/best[height<=720]/best",
                     "noplaylist": True,
                     "geo_bypass": True,
+                    "geo_bypass_country": "US",
                     "nocheckcertificate": True,
                     "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
                     "http_headers": {
@@ -352,27 +425,26 @@ else:
                 
                 st.success("Media Ready for Download!")
                 
-                # First Button: Monetized Ad Link
+                # First Button: Renamed cleanly to "Download" as requested for revenue/ads
                 st.markdown(
-                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download in Browser (Via Monetized Ad Link)</a>',
+                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download</a>',
                     unsafe_allow_html=True,
                 )
                 
-                # Second Button: Direct Download Button right below it
+                # Second Button: Direct Video Download Alternative for actual direct file saving
                 st.markdown(
                     f'<a href="{direct_url}" target="_blank" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download (Alternative)</a>',
                     unsafe_allow_html=True,
                 )
             else:
-                st.error("The media link could not be processed. Please verify the URL or try another public link.")
+                st.error("The media link could not be processed due to country or region restriction. Please try another public link.")
 
         except Exception as e:
-            # Smart Fallback Message for Instagram or Protected Reels restriction
-            st.error(f"Download restriction or empty response from platform. Please try another public link or direct source.")
+            st.error(f"Geo-restriction or extraction error encountered: {e}. Please try another public video link.")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # Active Downloads Status Box matching Reference Image 3 & 4
+    # Active Downloads Status Box
     st.markdown("""
         <div class="card-box">
             <h4 style="color: #dc2626; font-size: 14px; font-weight: bold; margin-bottom: 8px;">📁 Gallery & Active Downloads Status: Ready to manage your downloaded media</h4>
