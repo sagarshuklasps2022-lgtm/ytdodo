@@ -400,31 +400,34 @@ else:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(target_url, download=False)
                 direct_url = info.get("url")
-                thumbnail = info.get("thumbnail")
                 title = info.get("title", "Media_Video")
 
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
                 
-                st.success("Media Ready for Download!")
-                
-                # Video Player & Thumbnail Display inside app
-                if thumbnail:
-                    st.image(thumbnail, caption=f"📹 {title}", use_container_width=True)
+                st.success("Media Ready for Playback & Download!")
                 
                 # Clean filename generator
                 safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
                 filename = f"{safe_title}.mp4"
                 
+                # Video Player Display with Exact Video Title on Top
+                st.markdown(f"""
+                    <div style="background:#1f242d; padding:10px 15px; border-radius:10px 10px 0 0; border:1px solid {border_color}; border-bottom:none;">
+                        <p style="color:#ffffff; font-size:14px; font-weight:bold; margin:0;">▶ {title}</p>
+                    </div>
+                """, unsafe_allow_html=True)
+                st.video(direct_url)
+                
                 # Monetized Ad Download Link Button
                 st.markdown(
-                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-bottom: 12px;">📥 Download (Via Ad Link)</a>',
+                    f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:16px;box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4); margin-top: 15px; margin-bottom: 12px;">📥 Download (Via Ad Link)</a>',
                     unsafe_allow_html=True,
                 )
                 
-                # Direct Video Download Button with correct title attribute
+                # Direct Video Download Button with Exact Title
                 st.markdown(
-                    f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:35]}...)</a>',
+                    f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:40]}...)</a>',
                     unsafe_allow_html=True,
                 )
             else:
