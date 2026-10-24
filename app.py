@@ -408,11 +408,11 @@ else:
                 
                 st.success("Media Ready for Download!")
                 
-                # Video Thumbnail Cover Display
+                # Video Player & Thumbnail Display inside app
                 if thumbnail:
                     st.image(thumbnail, caption=f"📹 {title}", use_container_width=True)
                 
-                # Clean filename generator for safe download naming
+                # Clean filename generator
                 safe_title = "".join(c for c in title if c.isalnum() or c in (' ', '_', '-')).strip()
                 filename = f"{safe_title}.mp4"
                 
@@ -422,21 +422,11 @@ else:
                     unsafe_allow_html=True,
                 )
                 
-                # Direct Download Button using Streamlit download button with exact video title filename
-                try:
-                    video_bytes = requests.get(direct_url, timeout=15).content
-                    st.download_button(
-                        label=f"⬇️ Direct Download: {filename}",
-                        data=video_bytes,
-                        file_name=filename,
-                        mime="video/mp4",
-                        use_container_width=True
-                    )
-                except Exception:
-                    st.markdown(
-                        f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:35]}...)</a>',
-                        unsafe_allow_html=True,
-                    )
+                # Direct Video Download Button with correct title attribute
+                st.markdown(
+                    f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:35]}...)</a>',
+                    unsafe_allow_html=True,
+                )
             else:
                 st.error("The media link could not be processed.")
 
