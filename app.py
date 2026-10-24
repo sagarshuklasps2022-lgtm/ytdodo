@@ -426,7 +426,7 @@ else:
                     unsafe_allow_html=True,
                 )
                 
-                # Direct Stream Downloader link with proper filename attribute
+                # Direct Video Download Button with Exact Title (Ye button hamesha sahi naam se download karega)
                 st.markdown(
                     f'<a href="{direct_url}" download="{filename}" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">⬇️ Direct Video Download ({filename[:40]}...)</a>',
                     unsafe_allow_html=True,
