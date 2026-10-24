@@ -23,7 +23,7 @@ def get_video_info():
             "nocheckcertificate": True,
             "extractor_args": {
                 "youtube": {
-                    "player_client": ["android", "web"]
+                    "player_client": ["android", "ios", "web"]
                 }
             },
             "http_headers": {
@@ -38,11 +38,17 @@ def get_video_info():
             title = info.get('title', 'YT Dodo Media Stream')
             stream_url = info.get('url', '')
             
+            # अगर डायरेक्ट यूआरएल न मिले तो formats लिस्ट से mp4 ढूंढना
             if not stream_url and 'formats' in info:
                 for f in info['formats']:
-                    if f.get('url') and f.get('vcodec') != 'none':
+                    if f.get('url') and f.get('vcodec') != 'none' and f.get('ext') == 'mp4':
                         stream_url = f['url']
                         break
+                if not stream_url:
+                    for f in info['formats']:
+                        if f.get('url') and f.get('vcodec') != 'none':
+                            stream_url = f['url']
+                            break
 
             return jsonify({
                 'title': title, 
