@@ -421,7 +421,7 @@ else:
             if direct_url:
                 shortened_url = shorten_with_shrinkme(direct_url)
                 
-        st.success("Media Ready for Download!")
+                st.success("Media Ready for Download!")
                 
                 # First Button: Renamed cleanly to "Download" for monetization/ads
                 st.markdown(
@@ -454,4 +454,4 @@ else:
 
 # Final Footer for all screens
 st.markdown("<hr style='border-color: #30363d; margin-top: 40px;'>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: gray; font-size: 11px;'>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html
+st.markdown("<p style='text-align: center; color: gray; font-size: 11px;'>YT Dodo Universal Media Hub © 2026 | This app is created by Sagar Shukla</p>", unsafe_allow_html=True)
