@@ -426,23 +426,38 @@ else:
                     unsafe_allow_html=True,
                 )
                 
-                # 2. Direct Video Download using Streamlit's native st.download_button for 100% reliable saving with exact title
-                st.write("👇 Click below to save video directly with its exact title:")
-                try:
-                    with st.spinner("Fetching direct stream for saving..."):
-                        stream_bytes = requests.get(direct_url, timeout=15, stream=True).content
-                    st.download_button(
-                        label="Direct Video Download",
-                        data=stream_bytes,
-                        file_name=filename,
-                        mime="video/mp4",
-                        use_container_width=True
-                    )
-                except Exception:
-                    st.markdown(
-                        f'<a href="{direct_url}" download="{filename}" target="_self" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">Direct Video Download</a>',
-                        unsafe_allow_html=True,
-                    )
+                # 2. Direct Video Download using server-side yt_dlp processing to prevent 0-byte file corruption
+                if st.button("Direct Video Download", use_container_width=True):
+                    with st.spinner("Downloading media securely... Please wait."):
+                        try:
+                            out_file = f"ytdodo_{random.randint(1000,9999)}.mp4"
+                            dl_opts = {
+                                "format": "best[ext=mp4]/best",
+                                "outtmpl": out_file,
+                                "noplaylist": True,
+                                "geo_bypass": True,
+                                "nocheckcertificate": True,
+                                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+                            }
+                            with yt_dlp.YoutubeDL(dl_opts) as ydl_dl:
+                                ydl_dl.download([target_url])
+                            
+                            if os.path.exists(out_file) and os.path.getsize(out_file) > 1000:
+                                with open(out_file, "rb") as f:
+                                    video_bytes = f.read()
+                                os.remove(out_file)
+                                st.download_button(
+                                    label="💾 Click here to save file now",
+                                    data=video_bytes,
+                                    file_name=filename,
+                                    mime="video/mp4",
+                                    use_container_width=True
+                                )
+                                st.success("File ready! Click the save button above.")
+                            else:
+                                st.error("Download failed or file is empty.")
+                        except Exception as e:
+                            st.error(f"Download error: {e}")
             else:
                 st.error("The media link could not be processed.")
 
