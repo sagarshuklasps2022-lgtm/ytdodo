@@ -380,20 +380,22 @@ else:
 
     if st.button("Search & Prepare Download", use_container_width=True) and target_url:
         try:
-            # Fully robust error-free fallback formatting to prevent any 'Requested format is not available' error
+            # Bulletproof extraction settings using Android/Web client bypass
             if "MP3" in format_type.upper():
                 ydl_opts = {
                     "format": "bestaudio/best",
                     "noplaylist": True,
                     "geo_bypass": True,
                     "nocheckcertificate": True,
+                    "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
                 }
             else:
                 ydl_opts = {
-                    "format": "best/bestvideo+bestaudio/best",
+                    "format": "best[ext=mp4]/best",
                     "noplaylist": True,
                     "geo_bypass": True,
                     "nocheckcertificate": True,
+                    "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
                 }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
