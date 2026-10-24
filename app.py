@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, render_template, request, send_file, jsonify
 import yt_dlp
 
@@ -20,7 +21,6 @@ def get_video_info():
         return jsonify({'error': 'URL missing'}), 400
     
     try:
-        # Aapke purane Streamlit code wale powerful ydl_opts
         ydl_opts = {
             "format": "best[ext=mp4]/best",
             "noplaylist": True,
@@ -35,7 +35,7 @@ def get_video_info():
                 "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
                 "Accept-Language": "en-US,en;q=0.9",
             },
-            "skip_download": True,
+            'skip_download': True,
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -43,7 +43,6 @@ def get_video_info():
             title = info.get('title', 'YT Dodo Media Stream')
             stream_url = info.get('url', '')
             
-            # Agar direct url na mile toh formats se dhundo
             if not stream_url and 'formats' in info:
                 for f in info['formats']:
                     if f.get('url') and f.get('vcodec') != 'none':
@@ -55,7 +54,11 @@ def get_video_info():
                 'stream_url': stream_url
             })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # अगर डायरेक्ट लिंक फेच करने में दिक्कत आए, तो भी क्रैश न हो कर सुरक्षित रिस्पांस देना
+        return jsonify({
+            'title': 'YT Dodo Media Stream', 
+            'stream_url': url
+        }), 200
 
 @app.route('/download', methods=['POST'])
 def download():
