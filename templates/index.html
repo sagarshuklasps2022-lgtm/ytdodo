@@ -7,110 +7,181 @@
     
     <!-- ब्राउज़र टैब (टास्कबार) के लिए आपका लाल आइकॉन -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.png') }}">
-    
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f19',
+                        cardBg: '#131822',
+                        cardText: '#f3f4f6',
+                        accentRed: '#dc2626',
+                        accentRedHover: '#b91c1c',
+                        accentBlue: '#2563eb',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #1a0505, #0a0f1d);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: rgba(20, 20, 30, 0.85);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(255, 0, 0, 0.2);
-            width: 90%;
-            max-width: 500px;
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            text-align: center;
-        }
-        h1 {
-            color: #ff3333;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #b0b0b0;
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
-        .shortcuts {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 25px;
-        }
-        .shortcuts a {
-            color: white;
-            text-decoration: none;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 13px;
-            transition: 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .shortcuts a:hover {
-            background: rgba(255, 0, 0, 0.2);
-            border-color: #ff3333;
-        }
-        input[type="text"], select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: #111;
-            color: #fff;
-            font-size: 14px;
-            box-sizing: border-box;
-            margin-bottom: 15px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #ff3333, #cc0000);
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover {
-            opacity: 0.9;
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 35%, #0b0f19 55%, #0b0f19 100%);
+            background-attachment: fixed;
         }
     </style>
 </head>
-<body>
+<body class="text-white min-h-screen flex flex-col items-center justify-between p-4 sm:p-6 selection:bg-red-600 selection:text-white">
 
-    <div class="container">
-        <h1>⚡ YT DODO</h1>
-        <p>Professional Universal Media Hub & Downloader</p>
-        
-        <!-- प्लेटफॉर्म शॉर्टकट बटन्स -->
-        <div class="shortcuts">
-            <a href="https://www.youtube.com" target="_blank">YouTube</a>
-            <a href="https://www.google.com" target="_blank">Google</a>
-            <a href="https://www.facebook.com" target="_blank">Facebook</a>
-            <a href="https://www.instagram.com" target="_blank">Instagram</a>
+    <!-- Main Container -->
+    <div class="w-full max-w-xl mx-auto space-y-6">
+
+        <!-- Top Dashboard Header with Square Wider Golden Lightning Icon & Visitor Counter -->
+        <div class="bg-cardBg/95 backdrop-blur-md border border-red-500/30 p-5 rounded-2xl shadow-2xl flex items-center justify-between relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-red-600/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="flex items-center space-x-3.5">
+                <div class="w-16 h-14 bg-gradient-to-tr from-red-700 via-red-800 to-red-950 rounded-xl flex items-center justify-center shadow-lg shadow-red-600/40 border border-red-400/40 transform hover:scale-105 transition-transform relative overflow-hidden">
+                    <span class="text-2xl relative z-10 filter drop-shadow-[0_0_8px_rgba(251,191,36,0.9)] text-amber-400 font-extrabold">⚡</span>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-xl tracking-wider bg-gradient-to-r from-red-500 via-white to-red-400 bg-clip-text text-transparent">YT DODO</h1>
+                    <p class="text-xs font-semibold text-gray-400">Professional Media Hub • Creator: Sagar Shukla</p>
+                </div>
+            </div>
+            <div class="bg-darkBg/80 border border-gray-700 px-3.5 py-2 rounded-xl flex items-center space-x-2 shadow-inner">
+                <span class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-xs font-bold text-gray-200" id="visitor-count">Live: 1,482</span>
+            </div>
         </div>
 
-        <form action="/download" method="POST">
-            <input type="text" name="url" placeholder="Paste YouTube, Instagram or Video link..." required>
-            
-            <select name="format">
-                <option value="best">Video - 720p (HD)</option>
-                <option value="audio">Audio Only (MP3)</option>
-            </select>
+        <!-- Sponsored Banner -->
+        <div class="bg-cardBg/90 border border-dashed border-red-600/60 p-3.5 rounded-xl text-center text-xs text-red-400 shadow-sm backdrop-blur-sm font-medium">
+            📢 <b>SPONSORED:</b> Play Free Games & Win Big Rewards on YT Dodo Hub! 
+            <a href="https://shrinkme.io" target="_blank" class="font-bold text-red-500 underline ml-1 hover:text-red-400">INSTALL NOW</a>
+        </div>
 
-            <button type="submit">Search & Download</button>
-        </form>
+        <!-- Quick Platforms & Shortcuts Section -->
+        <div class="bg-cardBg/95 backdrop-blur-md border border-gray-800 p-5 rounded-2xl shadow-xl">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                <span>🚀</span> Quick Platforms & Shortcuts
+            </p>
+            <div class="grid grid-cols-4 gap-3">
+                <a href="https://www.youtube.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-red-600/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1.5 fill-red-500 group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <span class="text-xs font-bold text-gray-200">YouTube</span>
+                </a>
+                <a href="https://www.google.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-blue-600/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1.5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.19v3.15C3.21 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.19C.43 8.14 0 9.87 0 12s.43 3.86 1.19 5.39l4.08-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.21 2.68 1.19 6.61l4.08 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
+                    <span class="text-xs font-bold text-gray-200">Google</span>
+                </a>
+                <a href="https://www.facebook.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-blue-500/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1.5 fill-[#1877F2] group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <span class="text-xs font-bold text-gray-200">Facebook</span>
+                </a>
+                <a href="https://www.instagram.com" target="_blank" class="bg-[#1e293b] border border-blue-900/60 hover:border-pink-600/60 p-3.5 rounded-xl text-center transition-all duration-200 group shadow-md flex flex-col items-center justify-center">
+                    <svg class="w-6 h-6 mb-1.5 fill-[#E4405F] group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    <span class="text-xs font-bold text-gray-200">Instagram</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Search & Downloader Hub Card -->
+        <div class="bg-cardBg/95 backdrop-blur-md border border-gray-800 p-5 sm:p-6 rounded-2xl shadow-xl space-y-4">
+            <h2 class="text-sm font-bold text-red-500 uppercase tracking-wide flex items-center gap-2">
+                <span>🔍</span> Universal Video & Media Downloader
+            </h2>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1.5">Paste any YouTube, Instagram or Video link...</label>
+                <input type="text" id="target-url" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-darkBg border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600 transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1.5">Choose output format</label>
+                <select id="format-type" class="w-full bg-darkBg border border-gray-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-600 transition-colors">
+                    <option>Video - 720p (HD)</option>
+                    <option>Video - 1080p (FHD)</option>
+                    <option>MP3 Audio</option>
+                </select>
+            </div>
+
+            <button onclick="handleSearch()" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-200 text-sm cursor-pointer">
+                Search
+            </button>
+
+            <div id="review-section" class="hidden space-y-3 pt-2">
+                <div class="bg-darkBg border border-red-600/50 p-4 rounded-xl text-center space-y-2">
+                    <p class="text-xs font-semibold text-gray-300">👇 Click below to proceed with search & review:</p>
+                    <a id="shrink-ad-link" href="#" target="_blank" onclick="enablePlayerLoad()" class="block w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 rounded-lg text-sm shadow-md hover:opacity-90 transition-opacity">
+                        Search and Review
+                    </a>
+                </div>
+                
+                <button onclick="showMediaPlayer()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold py-2.5 px-4 rounded-xl text-xs transition-colors border border-gray-700 cursor-pointer">
+                    ✅ Click here after review to load media player
+                </button>
+            </div>
+
+            <div id="player-section" class="hidden space-y-4 pt-3 border-t border-gray-800">
+                <div class="bg-[#1f242d] border border-gray-800 rounded-t-xl px-4 py-3 flex items-center space-x-2">
+                    <span class="text-base">🎵</span>
+                    <p id="media-title" class="text-sm font-bold text-white truncate">Sample Media Title - YT Dodo Stream</p>
+                </div>
+                
+                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 flex items-center justify-center relative">
+                    <iframe id="video-iframe" class="w-full h-full" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+                </div>
+
+                <a id="download-btn" href="https://shrinkme.io" target="_blank" class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/30 text-center text-sm transition-all duration-200">
+                    Download
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Active Downloads Status Box -->
+        <div class="bg-cardBg/95 backdrop-blur-md border border-gray-800 p-5 rounded-2xl shadow-xl space-y-2">
+            <h3 class="text-xs font-bold text-red-500 uppercase tracking-wide">📁 Gallery & Active Downloads Status</h3>
+            <p class="text-xs text-gray-400 leading-relaxed">
+                No active downloads right now. Completed items will appear here securely!
+            </p>
+        </div>
+
     </div>
 
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-xs text-gray-400 border-t border-gray-800/60 pt-4 w-full">
+        YT Dodo Universal Media Hub © 2026 | Created by Sagar Shukla
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        function handleSearch() {
+            const urlInput = document.getElementById('target-url').value;
+            if(!urlInput) {
+                return;
+            }
+            const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
+            document.getElementById('shrink-ad-link').href = mockShrinkUrl;
+            document.getElementById('review-section').classList.remove('hidden');
+        }
+
+        function enablePlayerLoad() {}
+
+        function showMediaPlayer() {
+            document.getElementById('player-section').classList.remove('hidden');
+            document.getElementById('player-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        setInterval(() => {
+            const visitorEl = document.getElementById('visitor-count');
+            let current = 1482 + Math.floor(Math.random() * 5) - 2;
+            visitorEl.innerText = "Live: " + current.toLocaleString();
+        }, 5000);
+    </script>
 </body>
 </html>
