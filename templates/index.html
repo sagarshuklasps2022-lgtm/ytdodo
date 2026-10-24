@@ -11,7 +11,7 @@
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background: linear-gradient(135deg, #1a0505, #0a0f1d);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #ffffff;
@@ -20,71 +20,43 @@
             align-items: center;
             min-height: 100vh;
         }
-        .main-container {
-            width: 100%;
-            max-width: 600px;
-        }
-        .card {
+        .container {
             background: rgba(20, 20, 30, 0.85);
-            padding: 25px;
+            padding: 30px;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(255, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
             border: 1px solid rgba(255, 0, 0, 0.3);
-            margin-bottom: 20px;
-        }
-        .header-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 0, 0, 0.1);
-            padding: 15px 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 0, 0, 0.3);
-            margin-bottom: 20px;
-        }
-        .header-title h2 {
-            margin: 0;
-            color: #ff3333;
-            font-size: 22px;
-        }
-        .header-title p {
-            margin: 5px 0 0 0;
-            color: #b0b0b0;
-            font-size: 12px;
-        }
-        .live-badge {
-            background: #00cc44;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .shortcuts-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .shortcut-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 10px;
             text-align: center;
+        }
+        h1 {
+            color: #ff3333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #b0b0b0;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .shortcuts {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+        }
+        .shortcuts a {
             color: white;
             text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 8px;
             font-size: 13px;
             transition: 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .shortcut-btn:hover {
+        .shortcuts a:hover {
             background: rgba(255, 0, 0, 0.2);
             border-color: #ff3333;
-        }
-        h3 {
-            color: #ff3333;
-            font-size: 16px;
-            margin-bottom: 15px;
         }
         input[type="text"], select {
             width: 100%;
@@ -97,7 +69,7 @@
             box-sizing: border-box;
             margin-bottom: 15px;
         }
-        .download-btn {
+        button {
             width: 100%;
             padding: 12px;
             border: none;
@@ -109,64 +81,35 @@
             cursor: pointer;
             transition: 0.3s;
         }
-        .download-btn:hover {
+        button:hover {
             opacity: 0.9;
-        }
-        .footer-text {
-            text-align: center;
-            color: #888;
-            font-size: 12px;
-            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <!-- टॉप बैनर -->
-        <div class="header-box">
-            <div class="header-title">
-                <h2>⚡ YT DODO</h2>
-                <p>Professional Media Hub • Creator: Sagar Shukla</p>
-            </div>
-            <div class="live-badge">● Live</div>
+    <div class="container">
+        <h1>⚡ YT DODO</h1>
+        <p>Professional Universal Media Hub & Downloader</p>
+        
+        <!-- प्लेटफॉर्म शॉर्टकट बटन्स -->
+        <div class="shortcuts">
+            <a href="https://www.youtube.com" target="_blank">YouTube</a>
+            <a href="https://www.google.com" target="_blank">Google</a>
+            <a href="https://www.facebook.com" target="_blank">Facebook</a>
+            <a href="https://www.instagram.com" target="_blank">Instagram</a>
         </div>
 
-        <!-- क्विक शॉर्टकट्स (YouTube, Google, Facebook, Instagram) -->
-        <div class="card">
-            <p style="margin-top:0; color:#aaa; font-size:13px;">⚡ QUICK PLATFORMS & SHORTCUTS</p>
-            <div class="shortcuts-grid">
-                <a href="https://www.youtube.com" target="_blank" class="shortcut-btn">YouTube</a>
-                <a href="https://www.google.com" target="_blank" class="shortcut-btn">Google</a>
-                <a href="https://www.facebook.com" target="_blank" class="shortcut-btn">Facebook</a>
-                <a href="https://www.instagram.com" target="_blank" class="shortcut-btn">Instagram</a>
-            </div>
-        </div>
+        <form action="/download" method="POST">
+            <input type="text" name="url" placeholder="Paste YouTube, Instagram or Video link..." required>
+            
+            <select name="format">
+                <option value="best">Video - 720p (HD)</option>
+                <option value="audio">Audio Only (MP3)</option>
+            </select>
 
-        <!-- वीडियो डाउनलोडर बॉक्स -->
-        <div class="card">
-            <h3>🔍 UNIVERSAL VIDEO & MEDIA DOWNLOADER</h3>
-            <form action="/download" method="POST">
-                <input type="text" name="url" placeholder="Paste YouTube, Instagram or Video link..." required>
-                
-                <select name="format">
-                    <option value="best">Video - Best Quality (HD)</option>
-                    <option value="audio">Audio Only (MP3)</option>
-                </select>
-
-                <button type="submit" class="download-btn">Search & Download</button>
-            </form>
-        </div>
-
-        <!-- गैलरी स्टेटस -->
-        <div class="card">
-            <p style="margin:0; font-size:13px; color:#aaa;">📁 GALLERY & ACTIVE DOWNLOADS STATUS</p>
-            <p style="margin:10px 0 0 0; font-size:12px; color:#666;">No active downloads right now. Completed items will appear here securely!</p>
-        </div>
-
-        <div class="footer-text">
-            YT Dodo Universal Media Hub &copy; 2026 | Created by Sagar Shukla
-        </div>
+            <button type="submit">Search & Download</button>
+        </form>
     </div>
 
 </body>
