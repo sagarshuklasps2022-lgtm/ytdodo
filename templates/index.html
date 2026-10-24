@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YT Dodo - Professional Media Hub</title>
     
-    <!-- ब्राउज़र टैब (टास्कबार) के लिए आपका लाल आइकॉन -->
+    <!-- Taskbar Icon -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='icon.png') }}">
 
     <!-- Tailwind CSS CDN -->
@@ -133,9 +133,9 @@
                     <p id="media-title" class="text-sm font-bold text-white truncate">Loading video title...</p>
                 </div>
                 
-                <!-- Custom Iframe Frame Player (Inside App) -->
-                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative">
-                    <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <!-- Aapki website ka apna khud ka local HTML5 video player (3-dots download option ke sath) -->
+                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative flex items-center justify-center">
+                    <video id="local-video-player" class="w-full h-full" controls></video>
                 </div>
 
                 <!-- Actual Flask Download Form -->
@@ -162,7 +162,7 @@
     </footer>
 
     <script>
-        let fetchedVideoId = "";
+        let fetchedStreamUrl = "";
         let fetchedTitle = "";
 
         async function handleSearch() {
@@ -173,7 +173,7 @@
             }
 
             const searchBtn = document.getElementById('search-btn');
-            searchBtn.innerText = "Fetching Video Title...";
+            searchBtn.innerText = "Fetching Video Details...";
             searchBtn.disabled = true;
 
             document.getElementById('hidden-download-url').value = urlInput;
@@ -189,14 +189,14 @@
                 });
                 const data = await response.json();
                 
-                if(data.video_id) {
-                    fetchedVideoId = data.video_id;
+                if(data.stream_url) {
+                    fetchedStreamUrl = data.stream_url;
                     fetchedTitle = data.title;
                     searchBtn.innerText = "Search";
                     searchBtn.disabled = false;
                     document.getElementById('review-section').classList.remove('hidden');
                 } else {
-                    alert("Could not fetch video info. Please try another link.");
+                    alert("Could not fetch video stream. Please try another link.");
                     searchBtn.innerText = "Search";
                     searchBtn.disabled = false;
                 }
@@ -209,10 +209,12 @@
         }
 
         function showMediaPlayer() {
-            if(fetchedVideoId) {
+            if(fetchedStreamUrl) {
                 document.getElementById('media-title').innerText = fetchedTitle;
-                // Clean embed URL inside iframe frame player
-                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + fetchedVideoId + "?autoplay=1&controls=1&modestbranding=1&rel=0";
+                const videoPlayer = document.getElementById('local-video-player');
+                videoPlayer.src = fetchedStreamUrl;
+                videoPlayer.load();
+                videoPlayer.play();
             }
             document.getElementById('player-section').classList.remove('hidden');
             document.getElementById('player-section').scrollIntoView({ behavior: 'smooth' });
