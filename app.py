@@ -4,7 +4,6 @@ import yt_dlp
 
 app = Flask(__name__)
 
-# डाउनलोड्स को सेव करने के लिए फोल्डर
 DOWNLOAD_FOLDER = 'downloads'
 if not os.path.exists(DOWNLOAD_FOLDER):
     os.makedirs(DOWNLOAD_FOLDER)
