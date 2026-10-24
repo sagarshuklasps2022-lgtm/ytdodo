@@ -3,6 +3,7 @@ import streamlit as st
 import yt_dlp
 import requests
 import random
+import base64
 
 # Page configuration
 st.set_page_config(
@@ -426,11 +427,35 @@ else:
                     unsafe_allow_html=True,
                 )
                 
-                # 2. Direct Video Download Button using HTML5 download attribute with absolute safety bypass
-                st.markdown(
-                    f'<a href="{direct_url}" download="{filename}" target="_self" style="display:block;padding:14px 20px;background:linear-gradient(135deg, #21262d, #161b22);color:#9ca3af;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:14px;border: 1px solid #30363d;">Direct Video Download</a>',
-                    unsafe_allow_html=True,
-                )
+                # 2. Direct Video Download using JavaScript Blob Fetch (Forces direct local device download without opening new tabs or players)
+                js_download_code = f"""
+                <script>
+                async function downloadFile_{abs(hash(filename))}() {{
+                    const btn = document.getElementById('dl_btn_{abs(hash(filename))}');
+                    btn.innerHTML = "⏳ Downloading...";
+                    try {{
+                        const response = await fetch("{direct_url}");
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = "{filename}";
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        btn.innerHTML = "⬇️ Direct Video Download";
+                    }} catch (e) {{
+                        window.open("{direct_url}", "_blank");
+                        btn.innerHTML = "⬇️ Direct Video Download";
+                    }}
+                }}
+                </script>
+                <button id="dl_btn_{abs(hash(filename))}" onclick="downloadFile_{abs(hash(filename))}()" style="width:100%; padding:14px 20px; background:linear-gradient(135deg, #21262d, #161b22); color:#9ca3af; font-weight:bold; border-radius:12px; text-align:center; font-size:14px; border:1px solid #30363d; cursor:pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    Direct Video Download
+                </button>
+                """
+                st.markdown(js_download_code, unsafe_allow_html=True)
             else:
                 st.error("The media link could not be processed.")
 
