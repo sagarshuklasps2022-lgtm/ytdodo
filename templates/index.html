@@ -133,7 +133,6 @@
                     <p id="media-title" class="text-sm font-bold text-white truncate">Loading video title...</p>
                 </div>
                 
-                <!-- Clean Video Player (Direct play, no cover) -->
                 <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative">
                     <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
@@ -211,8 +210,7 @@
         function showMediaPlayer() {
             if(fetchedVideoId) {
                 document.getElementById('media-title').innerText = fetchedTitle;
-                // Clean embed URL with autoplay and controls to show direct video player
-                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + fetchedVideoId + "?autoplay=1&controls=1&modestbranding=1";
+                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + fetchedVideoId + "?autoplay=1&controls=1&modestbranding=1&rel=0";
             }
             document.getElementById('player-section').classList.remove('hidden');
             document.getElementById('player-section').scrollIntoView({ behavior: 'smooth' });
