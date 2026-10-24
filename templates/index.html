@@ -108,7 +108,7 @@
                 </select>
             </div>
 
-            <button onclick="handleSearch()" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-200 text-sm cursor-pointer">
+            <button onclick="handleSearch()" id="search-btn" class="w-full bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-200 text-sm cursor-pointer">
                 Search
             </button>
 
@@ -130,11 +130,12 @@
             <div id="player-section" class="hidden space-y-4 pt-3 border-t border-gray-800">
                 <div class="bg-[#1f242d] border border-gray-800 rounded-t-xl px-4 py-3 flex items-center space-x-2">
                     <span class="text-base">🎵</span>
-                    <p id="media-title" class="text-sm font-bold text-white truncate">YT Dodo Media Stream</p>
+                    <p id="media-title" class="text-sm font-bold text-white truncate">Loading video title...</p>
                 </div>
                 
-                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 flex items-center justify-center relative">
-                    <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
+                <!-- Clean Video Player (Direct play, no cover) -->
+                <div class="aspect-video bg-black rounded-b-xl overflow-hidden border border-gray-800 relative">
+                    <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
 
                 <!-- Actual Flask Download Form -->
@@ -161,37 +162,57 @@
     </footer>
 
     <script>
-        function extractVideoId(url) {
-            let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            let match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
+        let fetchedVideoId = "";
+        let fetchedTitle = "";
 
-        function handleSearch() {
+        async function handleSearch() {
             const urlInput = document.getElementById('target-url').value;
-            const videoId = extractVideoId(urlInput);
-
-            if(!videoId) {
-                alert("Please enter a valid YouTube link!");
+            if(!urlInput) {
+                alert("Please paste a link first!");
                 return;
             }
 
-            // Set hidden form input for final download
+            const searchBtn = document.getElementById('search-btn');
+            searchBtn.innerText = "Fetching Video Title...";
+            searchBtn.disabled = true;
+
             document.getElementById('hidden-download-url').value = urlInput;
 
-            // Mock ad link
             const mockShrinkUrl = "https://shrinkme.io/st?api=5993c830ec96cd0e9e4731657116fce22629f311&url=" + encodeURIComponent(urlInput);
             document.getElementById('shrink-ad-link').href = mockShrinkUrl;
-            document.getElementById('review-section').classList.remove('hidden');
+
+            try {
+                const response = await fetch('/get-video-info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: urlInput })
+                });
+                const data = await response.json();
+                
+                if(data.video_id) {
+                    fetchedVideoId = data.video_id;
+                    fetchedTitle = data.title;
+                    searchBtn.innerText = "Search";
+                    searchBtn.disabled = false;
+                    document.getElementById('review-section').classList.remove('hidden');
+                } else {
+                    alert("Could not fetch video info. Please try another link.");
+                    searchBtn.innerText = "Search";
+                    searchBtn.disabled = false;
+                }
+            } catch(err) {
+                console.error("Error:", err);
+                alert("Server connection error!");
+                searchBtn.innerText = "Search";
+                searchBtn.disabled = false;
+            }
         }
 
         function showMediaPlayer() {
-            const urlInput = document.getElementById('target-url').value;
-            const videoId = extractVideoId(urlInput);
-
-            if(videoId) {
-                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + videoId;
-                document.getElementById('media-title').innerText = "Playing: " + urlInput;
+            if(fetchedVideoId) {
+                document.getElementById('media-title').innerText = fetchedTitle;
+                // Clean embed URL with autoplay and controls to show direct video player
+                document.getElementById('video-iframe').src = "https://www.youtube-nocookie.com/embed/" + fetchedVideoId + "?autoplay=1&controls=1&modestbranding=1";
             }
             document.getElementById('player-section').classList.remove('hidden');
             document.getElementById('player-section').scrollIntoView({ behavior: 'smooth' });
