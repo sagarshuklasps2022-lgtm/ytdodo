@@ -254,7 +254,6 @@ if st.session_state.ad_step and st.session_state.saved_target_url:
     current_link = st.session_state.saved_target_url
     shortened_ad_url = shorten_with_shrinkme(current_link)
 
-    # 1. Big Blue/Red Button for ShrinkMe Verification (First Step)
     st.markdown(
         f'<div class="card-box" style="border: 1px solid #dc2626; text-align:center;">'
         f'<p style="color:#ffffff; font-size:13px; font-weight:bold; margin-bottom:12px;">👇 Step 1: Click the big button below to complete verification:</p>'
@@ -312,7 +311,6 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             else:
                 st.video(direct_url)
 
-            # 2. Two Download Buttons: Big Blue (Main) & Small Discreet Black/Gray (Secondary Secure Download)
             st.markdown(
                 f'<div style="margin-top: 15px; margin-bottom: 12px;">'
                 f'<a href="{direct_url}" download="{title}.mp4" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-bottom: 10px;">📥 Download File (Primary)</a>'
