@@ -2,7 +2,6 @@ import os
 import streamlit as st
 import yt_dlp
 import requests
-import random
 
 # Page configuration
 st.set_page_config(
@@ -27,7 +26,7 @@ if "saved_format_type" not in st.session_state:
 if "download_history" not in st.session_state:
     st.session_state.download_history = []
 
-# Exact UI Styling matching your reference image with Golden text, Red Glow and Framed Cards
+# Exact UI Styling with Ninja-style Red Gradient Title & Two-Button Layout
 st.markdown("""
     <style>
     .stApp {
@@ -104,20 +103,23 @@ st.markdown("""
     .shortcut-card:hover {
         border-color: #dc2626;
     }
-    .yt-title {
+    .ninja-title {
+        font-family: 'Impact', Charcoal, sans-serif;
         font-weight: 900;
-        font-size: 18px;
-        letter-spacing: 1px;
-        background: linear-gradient(90deg, #ffffff 40%, #f87171 80%, #ef4444 100%);
+        font-size: 20px;
+        letter-spacing: 1.5px;
+        background: linear-gradient(135deg, #ff4d4d 0%, #dc2626 50%, #991b1b 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         margin: 0;
     }
     .golden-sub {
         color: #fbbf24;
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 700;
         margin: 2px 0 0 0;
+        letter-spacing: 0.5px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -139,7 +141,7 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- TOP HEADER ---
+# --- TOP HEADER WITH LIVE FLUCTUATING COUNTER ---
 st.markdown(f"""
     <div class="main-header">
         <div style="display: flex; align-items: center; gap: 14px;">
@@ -147,7 +149,7 @@ st.markdown(f"""
                 ⚡
             </div>
             <div>
-                <h3 class="yt-title">YT DODO</h3>
+                <h3 class="ninja-title">YT DODO</h3>
                 <p class="golden-sub">Professional Media Hub • Creator: Sagar Shukla</p>
             </div>
         </div>
@@ -160,11 +162,25 @@ st.markdown(f"""
                 <p style="color: #9ca3af; font-size: 9px; margin: 0; font-weight: bold; text-transform: uppercase;">Live</p>
                 <div style="display: flex; align-items: center; gap: 4px;">
                     <span style="color: #4ade80; font-size: 10px;">●</span>
-                    <span style="color: #ffffff; font-size: 12px; font-weight: bold;">👤 1,484</span>
+                    <span style="color: #ffffff; font-size: 12px; font-weight: bold;" id="live-counter">👤 1,484</span>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+    setInterval(() => {
+        const counterEl = document.getElementById('live-counter');
+        if (counterEl) {
+            let current = parseInt(counterEl.innerText.replace(/[^0-9]/g, '')) || 1484;
+            let change = Math.floor(Math.random() * 9) - 4;
+            let newVal = current + change;
+            if (newVal < 1400) newVal = 1410;
+            if (newVal > 1600) newVal = 1550;
+            counterEl.innerText = '👤 ' + newVal.toLocaleString();
+        }
+    }, 3000);
+    </script>
 """, unsafe_allow_html=True)
 
 # Sponsored Banner Ad
@@ -233,15 +249,16 @@ if st.button("Search", use_container_width=True) and target_url:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SECURE VERIFICATION & AD FLOW SECTION ---
+# --- SECURE VERIFICATION & TWO-BUTTON SYSTEM ---
 if st.session_state.ad_step and st.session_state.saved_target_url:
     current_link = st.session_state.saved_target_url
     shortened_ad_url = shorten_with_shrinkme(current_link)
 
+    # 1. Big Blue/Red Button for ShrinkMe Verification (First Step)
     st.markdown(
         f'<div class="card-box" style="border: 1px solid #dc2626; text-align:center;">'
-        f'<p style="color:#ffffff; font-size:13px; font-weight:bold; margin-bottom:12px;">👇 Click below to complete verification on ShrinkMe:</p>'
-        f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;font-size:14px;">Verify & Proceed to Ad Page</a>'
+        f'<p style="color:#ffffff; font-size:13px; font-weight:bold; margin-bottom:12px;">👇 Step 1: Click the big button below to complete verification:</p>'
+        f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:16px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;font-size:15px;box-shadow: 0 8px 20px rgba(37,99,235,0.4);">🔗 Verify & Proceed to Ad Page</a>'
         f'</div>',
         unsafe_allow_html=True
     )
@@ -274,16 +291,14 @@ if st.session_state.review_step and st.session_state.saved_target_url:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(active_url, download=False)
             direct_url = info.get("url")
-            title = info.get("title", "Media_Video")
+            title = info.get("title", "Media_File").replace("/", "_").replace("\\", "_")
 
         if direct_url:
-            final_download_link = shorten_with_shrinkme(direct_url)
-
             history_item = {"title": title, "url": active_url, "format": active_format}
             if history_item not in st.session_state.download_history:
                 st.session_state.download_history.insert(0, history_item)
 
-            st.success("Verification Successful! Media Player Ready.")
+            st.success("Verification Successful! Media is ready.")
 
             st.markdown(f"""
                 <div style="background:#131822; padding:12px 18px; border-radius:12px 12px 0 0; border:1px solid #30363d; border-bottom:none; display:flex; align-items:center; gap:10px;">
@@ -291,10 +306,18 @@ if st.session_state.review_step and st.session_state.saved_target_url:
                     <p style="color:#ffffff; font-size:14px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
                 </div>
             """, unsafe_allow_html=True)
-            st.video(direct_url)
+            
+            if "MP3" in active_format.upper():
+                st.audio(direct_url)
+            else:
+                st.video(direct_url)
 
+            # 2. Two Download Buttons: Big Blue (Main) & Small Discreet Black/Gray (Secondary Secure Download)
             st.markdown(
-                f'<a href="{final_download_link}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-top: 15px; margin-bottom: 12px;">Download Video File</a>',
+                f'<div style="margin-top: 15px; margin-bottom: 12px;">'
+                f'<a href="{direct_url}" download="{title}.mp4" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-bottom: 10px;">📥 Download File (Primary)</a>'
+                f'<a href="{direct_url}" download="{title}.mp4" target="_blank" style="display:block;padding:8px;background:#1e293b;color:#64748b;text-decoration:none;border-radius:8px;font-weight:normal;text-align:center;width:100%;font-size:11px;border:1px solid #334155;">🔒 Direct Stream Mirror (Backup)</a>'
+                f'</div>',
                 unsafe_allow_html=True,
             )
         else:
