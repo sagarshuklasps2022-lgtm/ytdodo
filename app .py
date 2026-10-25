@@ -139,7 +139,7 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- TOP HEADER (With Glowing YT Dodo & Golden Subtitle & Expanded Cloud/Live Boxes) ---
+# --- TOP HEADER ---
 st.markdown(f"""
     <div class="main-header">
         <div style="display: flex; align-items: center; gap: 14px;">
@@ -233,20 +233,20 @@ if st.button("Search", use_container_width=True) and target_url:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- AD FLOW & MEDIA PLAYER SECTION ---
+# --- SECURE VERIFICATION & AD FLOW SECTION ---
 if st.session_state.ad_step and st.session_state.saved_target_url:
     current_link = st.session_state.saved_target_url
     shortened_ad_url = shorten_with_shrinkme(current_link)
 
     st.markdown(
         f'<div class="card-box" style="border: 1px solid #dc2626; text-align:center;">'
-        f'<p style="color:#ffffff; font-size:13px; font-weight:bold; margin-bottom:12px;">👇 Click below to proceed with search & review:</p>'
-        f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;font-size:14px;">Search and Review</a>'
+        f'<p style="color:#ffffff; font-size:13px; font-weight:bold; margin-bottom:12px;">👇 Click below to complete verification on ShrinkMe:</p>'
+        f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:14px;background:linear-gradient(135deg, #dc2626, #991b1b);color:white;text-decoration:none;border-radius:12px;font-weight:bold;font-size:14px;">Verify & Proceed to Ad Page</a>'
         f'</div>',
         unsafe_allow_html=True
     )
 
-    if st.button("✅ Click here after review to load media player", use_container_width=True):
+    if st.button("✅ Click here after verification to load media player", use_container_width=True):
         st.session_state.review_step = True
 
 if st.session_state.review_step and st.session_state.saved_target_url:
@@ -277,13 +277,13 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             title = info.get("title", "Media_Video")
 
         if direct_url:
-            shortened_url = shorten_with_shrinkme(direct_url)
+            final_download_link = shorten_with_shrinkme(direct_url)
 
             history_item = {"title": title, "url": active_url, "format": active_format}
             if history_item not in st.session_state.download_history:
                 st.session_state.download_history.insert(0, history_item)
 
-            st.success("Media Ready for Download!")
+            st.success("Verification Successful! Media Player Ready.")
 
             st.markdown(f"""
                 <div style="background:#131822; padding:12px 18px; border-radius:12px 12px 0 0; border:1px solid #30363d; border-bottom:none; display:flex; align-items:center; gap:10px;">
@@ -294,7 +294,7 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             st.video(direct_url)
 
             st.markdown(
-                f'<a href="{shortened_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-top: 15px; margin-bottom: 12px;">Download</a>',
+                f'<a href="{final_download_link}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-top: 15px; margin-bottom: 12px;">Download Video File</a>',
                 unsafe_allow_html=True,
             )
         else:
