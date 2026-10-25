@@ -27,11 +27,11 @@ if "saved_format_type" not in st.session_state:
 if "download_history" not in st.session_state:
     st.session_state.download_history = []
 
-# Exact UI Styling with Professional SVG Platform Icons
+# Exact UI Styling matching your gorgeous Dark-Red Gradient background reference
 st.markdown("""
     <style>
     .stApp {
-        background-color: #0b0f19;
+        background: linear-gradient(180deg, #1a0505 0%, #0b0f19 50%, #0b0f19 100%);
         color: #ffffff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -52,16 +52,16 @@ st.markdown("""
         background: linear-gradient(135deg, #dc2626, #991b1b);
         color: white;
         font-weight: bold;
-        border-radius: 12px;
-        padding: 12px 20px;
+        border-radius: 14px;
+        padding: 14px 20px;
         border: none;
-        box-shadow: 0 6px 15px rgba(220, 38, 38, 0.4);
+        box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
         width: 100%;
     }
     .main-header {
         background: #131822;
         padding: 16px 20px;
-        border-radius: 16px;
+        border-radius: 18px;
         border: 1px solid #30363d;
         display: flex;
         justify-content: space-between;
@@ -72,7 +72,7 @@ st.markdown("""
     .card-box {
         background: #131822;
         padding: 22px;
-        border-radius: 16px;
+        border-radius: 18px;
         border: 1px solid #30363d;
         margin-bottom: 20px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -80,7 +80,7 @@ st.markdown("""
     .shortcut-card {
         background: #0b0f19;
         border: 1px solid #30363d;
-        padding: 15px 10px;
+        padding: 16px 10px;
         border-radius: 14px;
         text-align: center;
         color: #ffffff;
@@ -93,19 +93,13 @@ st.markdown("""
     .shortcut-card:hover {
         border-color: #dc2626;
     }
-    .add-url-card {
-        background: #0b0f19;
-        border: 1px dashed #dc2626;
-        padding: 15px 10px;
-        border-radius: 14px;
-        text-align: center;
-        color: #ef4444;
-        text-decoration: none;
-        display: block;
-        margin-bottom: 10px;
-    }
     </style>
 """, unsafe_allow_html=True)
+
+# Sidebar Settings
+st.sidebar.title("⚙️ Settings")
+st.session_state.theme_mode = st.sidebar.selectbox("Theme Mode", ["Dark", "Light"], index=0)
+st.session_state.app_lang = st.sidebar.selectbox("Language", ["English", "Hindi", "Tamil", "Telugu", "Marathi"], index=0)
 
 # Function to shorten URL using ShrinkMe API
 def shorten_with_shrinkme(long_url):
@@ -120,7 +114,7 @@ def shorten_with_shrinkme(long_url):
     return long_url
 
 # --- TOP HEADER ---
-st.markdown("""
+st.markdown(f"""
     <div class="main-header">
         <div style="display: flex; align-items: center; gap: 12px;">
             <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 10px; border-radius: 12px; color: white; font-size: 20px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(220,38,38,0.5);">
@@ -134,7 +128,7 @@ st.markdown("""
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="background: #0b0f19; padding: 8px 12px; border-radius: 12px; border: 1px solid #30363d; position: relative; display: flex; align-items: center; justify-content: center;">
                 <span style="font-size: 16px;">☁️</span>
-                <span style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 50%;">{}</span>
+                <span style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 50%;">{len(st.session_state.download_history)}</span>
             </div>
             <div style="background: #0b0f19; padding: 6px 12px; border-radius: 12px; border: 1px solid #30363d; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size: 14px;">👤</span>
@@ -142,12 +136,12 @@ st.markdown("""
             </div>
         </div>
     </div>
-""".format(len(st.session_state.download_history)), unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# --- FIRST CARD: QUICK PLATFORMS & SHORTCUTS ---
+# --- FIRST CARD: QUICK PLATFORMS & SHORTCUTS (With Rocket Emoji as in reference) ---
 st.markdown("""
     <div class="card-box">
-        <p style="color: #9ca3af; font-size: 12px; font-weight: bold; margin-bottom: 15px;">Quick Platforms & Shortcuts:</p>
+        <p style="color: #ef4444; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">🚀 QUICK PLATFORMS & SHORTCUTS</p>
 """, unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4)
@@ -184,34 +178,18 @@ with col4:
         </a>
     ''', unsafe_allow_html=True)
 
-col5, col6 = st.columns(2)
-with col5:
-    st.markdown('''
-        <a href="https://twitter.com" target="_blank" class="shortcut-card">
-            <svg height="24" viewBox="0 0 24 24" width="24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#ffffff"/></svg>
-            <div style="font-size:11px; font-weight:bold; color:#ffffff; margin-top:6px;">Twitter</div>
-        </a>
-    ''', unsafe_allow_html=True)
-with col6:
-    st.markdown('''
-        <a href="#" class="add-url-card">
-            <div style="font-size:22px; font-weight:bold; color:#ef4444; line-height:24px;">+</div>
-            <div style="font-size:11px; font-weight:bold; color:#ef4444; margin-top:6px;">Add URL</div>
-        </a>
-    ''', unsafe_allow_html=True)
-
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SECOND CARD: SEARCH & PASTE LINK HUB ---
+# --- SECOND CARD: UNIVERSAL VIDEO & MEDIA DOWNLOADER (With Magnifying Glass Emoji as in reference) ---
 st.markdown("""
     <div class="card-box">
-        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">SEARCH & PASTE LINK</p>
+        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">🔍 UNIVERSAL VIDEO & MEDIA DOWNLOADER</p>
 """, unsafe_allow_html=True)
 
-target_url = st.text_input("", placeholder="Paste link or search songs, videos, apps...", label_visibility="collapsed")
+target_url = st.text_input("", placeholder="Paste any YouTube, Instagram or Video link...", label_visibility="collapsed")
 format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio"])
 
-if st.button("🔍 Search", use_container_width=True) and target_url:
+if st.button("Search", use_container_width=True) and target_url:
     st.session_state.saved_target_url = target_url
     st.session_state.saved_format_type = format_type
     st.session_state.ad_step = True
@@ -265,7 +243,6 @@ if st.session_state.review_step and st.session_state.saved_target_url:
         if direct_url:
             shortened_url = shorten_with_shrinkme(direct_url)
 
-            # Automatically save into gallery history if not already added
             history_item = {"title": title, "url": active_url, "format": active_format}
             if history_item not in st.session_state.download_history:
                 st.session_state.download_history.insert(0, history_item)
@@ -290,10 +267,10 @@ if st.session_state.review_step and st.session_state.saved_target_url:
     except Exception as ex:
         st.error(f"Extraction error: {ex}")
 
-# --- THIRD CARD: ACTIVE DOWNLOADS & GALLERY STATUS (Dynamic History Display) ---
+# --- THIRD CARD: GALLERY & ACTIVE DOWNLOADS STATUS ---
 st.markdown("""
     <div class="card-box">
-        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">📁 Active Downloads & Gallery Status</p>
+        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">📁 GALLERY & ACTIVE DOWNLOADS STATUS</p>
 """, unsafe_allow_html=True)
 
 if len(st.session_state.download_history) > 0:
@@ -311,7 +288,7 @@ else:
     st.markdown("""
         <div style="background: #0b0f19; padding: 18px; border-radius: 12px; border: 1px solid #30363d; text-align: center;">
             <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.5;">
-                No active downloads right now. Click the top-right download icon to view completed files and options!
+                No active downloads right now. Completed items will appear here securely!
             </p>
         </div>
     """, unsafe_allow_html=True)
