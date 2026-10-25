@@ -27,11 +27,11 @@ if "saved_format_type" not in st.session_state:
 if "download_history" not in st.session_state:
     st.session_state.download_history = []
 
-# Exact UI Styling matching your precise reference frames and vibrant background glow
+# Exact UI Styling matching your reference image with Golden text, Red Glow and Framed Cards
 st.markdown("""
     <style>
     .stApp {
-        background: radial-gradient(circle at 10% 20%, #7f1d1d 0%, #450a0a 25%, #0b0f19 60%, #030712 100%);
+        background: radial-gradient(circle at 15% 15%, #991b1b 0%, #7f1d1d 20%, #1f0505 50%, #0b0f19 85%);
         color: #ffffff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -104,6 +104,21 @@ st.markdown("""
     .shortcut-card:hover {
         border-color: #dc2626;
     }
+    .yt-title {
+        font-weight: 900;
+        font-size: 18px;
+        letter-spacing: 1px;
+        background: linear-gradient(90deg, #ffffff 40%, #f87171 80%, #ef4444 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+    .golden-sub {
+        color: #fbbf24;
+        font-size: 12px;
+        font-weight: 600;
+        margin: 2px 0 0 0;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -124,7 +139,7 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- TOP HEADER ---
+# --- TOP HEADER (With Glowing YT Dodo & Golden Subtitle & Expanded Cloud/Live Boxes) ---
 st.markdown(f"""
     <div class="main-header">
         <div style="display: flex; align-items: center; gap: 14px;">
@@ -132,18 +147,21 @@ st.markdown(f"""
                 ⚡
             </div>
             <div>
-                <h3 style="color: #ffffff; font-weight: bold; font-size: 17px; margin: 0;">YT DODO</h3>
-                <p style="color: #9ca3af; font-size: 11px; margin: 0;">Professional Media Hub • Creator: Sagar Shukla</p>
+                <h3 class="yt-title">YT DODO</h3>
+                <p class="golden-sub">Professional Media Hub • Creator: Sagar Shukla</p>
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="background: #0b0f19; padding: 8px 12px; border-radius: 12px; border: 1px solid #30363d; position: relative; display: flex; align-items: center; justify-content: center;">
-                <span style="font-size: 16px;">☁️</span>
-                <span style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 50%;">{len(st.session_state.download_history)}</span>
+            <div style="background: #0b0f19; padding: 10px 16px; border-radius: 14px; border: 1px solid #30363d; position: relative; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 18px;">☁️</span>
+                <span style="position: absolute; top: -6px; right: -6px; background: #ea580c; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 50%;">{len(st.session_state.download_history)}</span>
             </div>
-            <div style="background: #0b0f19; padding: 6px 12px; border-radius: 12px; border: 1px solid #30363d; display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 14px;">👤</span>
-                <span style="color: #4ade80; font-size: 12px; font-weight: bold;">1,484</span>
+            <div style="background: #0b0f19; padding: 6px 14px; border-radius: 14px; border: 1px solid #30363d; text-align: center;">
+                <p style="color: #9ca3af; font-size: 9px; margin: 0; font-weight: bold; text-transform: uppercase;">Live</p>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="color: #4ade80; font-size: 10px;">●</span>
+                    <span style="color: #ffffff; font-size: 12px; font-weight: bold;">👤 1,484</span>
+                </div>
             </div>
         </div>
     </div>
