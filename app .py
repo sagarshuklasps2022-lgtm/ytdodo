@@ -142,6 +142,7 @@ def shorten_with_shrinkme(long_url):
     return long_url
 
 # --- TOP HEADER WITH LIVE FLUCTUATING COUNTER ---
+history_count = len(st.session_state.download_history)
 st.markdown(f"""
     <div class="main-header">
         <div style="display: flex; align-items: center; gap: 14px;">
@@ -156,7 +157,7 @@ st.markdown(f"""
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="background: #0b0f19; padding: 10px 16px; border-radius: 14px; border: 1px solid #30363d; position: relative; display: flex; align-items: center; justify-content: center;">
                 <span style="font-size: 18px;">☁️</span>
-                <span style="position: absolute; top: -6px; right: -6px; background: #ea580c; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 50%;">{len(st.session_state.download_history)}</span>
+                <span style="position: absolute; top: -6px; right: -6px; background: #ea580c; color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 50%;">{history_count}</span>
             </div>
             <div style="background: #0b0f19; padding: 6px 14px; border-radius: 14px; border: 1px solid #30363d; text-align: center;">
                 <p style="color: #9ca3af; font-size: 9px; margin: 0; font-weight: bold; text-transform: uppercase;">Live</p>
@@ -169,17 +170,17 @@ st.markdown(f"""
     </div>
 
     <script>
-    setInterval(() => {
-        const counterEl = document.getElementById('live-counter');
-        if (counterEl) {
-            let current = parseInt(counterEl.innerText.replace(/[^0-9]/g, '')) || 1484;
-            let change = Math.floor(Math.random() * 9) - 4;
-            let newVal = current + change;
+    setInterval(function() {{
+        var counterEl = document.getElementById('live-counter');
+        if (counterEl) {{
+            var current = parseInt(counterEl.innerText.replace(/[^0-9]/g, '')) || 1484;
+            var change = Math.floor(Math.random() * 9) - 4;
+            var newVal = current + change;
             if (newVal < 1400) newVal = 1410;
             if (newVal > 1600) newVal = 1550;
             counterEl.innerText = '👤 ' + newVal.toLocaleString();
-        }
-    }, 3000);
+        }}
+    }}, 3000);
     </script>
 """, unsafe_allow_html=True)
 
@@ -333,7 +334,7 @@ st.markdown("""
 if len(st.session_state.download_history) > 0:
     for idx, item in enumerate(st.session_state.download_history):
         st.markdown(f"""
-            <div style="background: #0b0f19; padding: 12px 16px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: { '#0b0f19' }; padding: 12px 16px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <p style="color: #ffffff; font-size: 12px; font-weight: bold; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px;">🎵 {item['title']}</p>
                     <p style="color: #4ade80; font-size: 10px; margin: 2px 0 0 0;">Format: {item['format']}</p>
