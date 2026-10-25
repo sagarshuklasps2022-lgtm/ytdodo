@@ -27,11 +27,11 @@ if "saved_format_type" not in st.session_state:
 if "download_history" not in st.session_state:
     st.session_state.download_history = []
 
-# Exact UI Styling with 45-degree Diagonal Red-to-Black Gradient Background
+# Exact UI Styling matching your precise reference frames and vibrant background glow
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, #450a0a 0%, #1f0505 35%, #0b0f19 70%, #030712 100%);
+        background: radial-gradient(circle at 10% 20%, #7f1d1d 0%, #450a0a 25%, #0b0f19 60%, #030712 100%);
         color: #ffffff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -60,22 +60,33 @@ st.markdown("""
     }
     .main-header {
         background: #131822;
-        padding: 16px 20px;
-        border-radius: 18px;
+        padding: 18px 22px;
+        border-radius: 20px;
         border: 1px solid #30363d;
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     }
     .card-box {
         background: #131822;
-        padding: 22px;
-        border-radius: 18px;
+        padding: 24px;
+        border-radius: 20px;
         border: 1px solid #30363d;
         margin-bottom: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .sponsored-banner {
+        background: #131822;
+        border: 1px dashed #dc2626;
+        padding: 16px;
+        border-radius: 16px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 12px;
+        color: #ef4444;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.2);
     }
     .shortcut-card {
         background: #0b0f19;
@@ -116,13 +127,13 @@ def shorten_with_shrinkme(long_url):
 # --- TOP HEADER ---
 st.markdown(f"""
     <div class="main-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 10px; border-radius: 12px; color: white; font-size: 20px; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(220,38,38,0.5);">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="background: linear-gradient(135deg, #dc2626, #991b1b); padding: 12px; border-radius: 14px; color: white; font-size: 22px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 15px rgba(220,38,38,0.5);">
                 ⚡
             </div>
             <div>
-                <h3 style="color: #ffffff; font-weight: bold; font-size: 16px; margin: 0;">YT DOODO</h3>
-                <p style="color: #9ca3af; font-size: 11px; margin: 0;">Welcome, <b>Sagar Shukla</b></p>
+                <h3 style="color: #ffffff; font-weight: bold; font-size: 17px; margin: 0;">YT DODO</h3>
+                <p style="color: #9ca3af; font-size: 11px; margin: 0;">Professional Media Hub • Creator: Sagar Shukla</p>
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -138,10 +149,17 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# --- FIRST CARD: QUICK PLATFORMS & SHORTCUTS ---
+# Sponsored Banner Ad
+st.markdown("""
+    <div class="sponsored-banner">
+        📢 <b>SPONSORED:</b> Play Free Games & Win Big Rewards on YT Dodo Hub! <a href="https://shrinkme.io" target="_blank" style="color:#ef4444; font-weight:bold; text-decoration:none;">INSTALL NOW</a>
+    </div>
+""", unsafe_allow_html=True)
+
+# --- FIRST FRAME: QUICK PLATFORMS & SHORTCUTS ---
 st.markdown("""
     <div class="card-box">
-        <p style="color: #ef4444; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">🚀 QUICK PLATFORMS & SHORTCUTS</p>
+        <p style="color: #ef4444; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 16px; letter-spacing: 0.5px;">🚀 QUICK PLATFORMS & SHORTCUTS</p>
 """, unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4)
@@ -180,13 +198,13 @@ with col4:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SECOND CARD: UNIVERSAL VIDEO & MEDIA DOWNLOADER ---
+# --- SECOND FRAME: UNIVERSAL VIDEO & MEDIA DOWNLOADER ---
 st.markdown("""
     <div class="card-box">
-        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">🔍 UNIVERSAL VIDEO & MEDIA DOWNLOADER</p>
+        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px;">🔍 UNIVERSAL VIDEO & MEDIA DOWNLOADER</p>
 """, unsafe_allow_html=True)
 
-target_url = st.text_input("", placeholder="Paste any YouTube, Instagram or Video link...", label_visibility="collapsed")
+target_url = st.text_input("Paste any YouTube, Instagram or Video link...", placeholder="https://www.youtube.com/watch?v=...", label_visibility="visible")
 format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio"])
 
 if st.button("Search", use_container_width=True) and target_url:
@@ -267,10 +285,10 @@ if st.session_state.review_step and st.session_state.saved_target_url:
     except Exception as ex:
         st.error(f"Extraction error: {ex}")
 
-# --- THIRD CARD: GALLERY & ACTIVE DOWNLOADS STATUS ---
+# --- THIRD FRAME: GALLERY & ACTIVE DOWNLOADS STATUS ---
 st.markdown("""
     <div class="card-box">
-        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">📁 GALLERY & ACTIVE DOWNLOADS STATUS</p>
+        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">📁 GALLERY & ACTIVE DOWNLOADS STATUS</p>
 """, unsafe_allow_html=True)
 
 if len(st.session_state.download_history) > 0:
