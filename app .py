@@ -2,6 +2,8 @@ import os
 import streamlit as st
 import yt_dlp
 import requests
+import imageio_ffmpeg
+import subprocess
 
 # Page configuration
 st.set_page_config(
@@ -241,7 +243,7 @@ with tab1:
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # --- SECOND FRAME: UNIVERSAL VIDEO DOWNLOADER (Only 2 Video Options) ---
+    # --- SECOND FRAME: UNIVERSAL VIDEO DOWNLOADER ---
     st.markdown("""
         <div class="card-box">
             <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px;">🔍 UNIVERSAL VIDEO DOWNLOADER</p>
@@ -353,11 +355,11 @@ with tab1:
     st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
-    # --- MP4 to MP3 CONVERTER TOOL TAB ---
+    # --- MP4 to MP3 CONVERTER TOOL TAB USING imageio_ffmpeg ---
     st.markdown("""
         <div class="card-box">
             <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px;">🎵 MP4 TO MP3 AUDIO CONVERTER</p>
-            <p style="color: #9ca3af; font-size: 12px; margin-bottom: 16px;">Upload any MP4 video file from your device and instantly extract high-quality MP3 audio!</p>
+            <p style="color: #9ca3af; font-size: 12px; margin-bottom: 16px;">Upload any MP4 video file from your device and instantly extract high-quality MP3 audio with clear sound!</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -372,15 +374,19 @@ with tab2:
         output_path = os.path.join("converted", f"{base_name}.mp3")
 
         if st.button("⚡ Convert to MP3 Now", use_container_width=True):
-            with st.spinner("Converting video to audio... Please wait."):
+            with st.spinner("Converting video and extracting clean audio... Please wait."):
                 try:
-                    # Using moviepy or ffmpeg if available, fallback using yt-dlp/os command
-                    import subprocess
-                    cmd = ["ffmpeg", "-y", "-i", input_path, "-q:a", "0", "-map", "a", output_path]
+                    # Automatically gets bundled ffmpeg path via imageio_ffmpeg, no external system setup needed!
+                    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+                    cmd = [
+                        ffmpeg_exe, "-y", "-i", input_path, 
+                        "-vn", "-acodec", "libmp3lame", "-b:a", "192k", 
+                        output_path
+                    ]
                     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     
                     if result.returncode == 0 and os.path.exists(output_path):
-                        st.success("Conversion Successful! Your MP3 audio is ready.")
+                        st.success("Conversion Successful! Your MP3 audio with sound is ready.")
                         with open(output_path, "rb") as audio_f:
                             audio_bytes = audio_f.read()
                         st.audio(audio_bytes, format="audio/mp3")
@@ -392,7 +398,8 @@ with tab2:
                             use_container_width=True
                         )
                     else:
-                        st.error("Conversion error: FFmpeg might not be installed on this server environment. Please try another method.")
+                        error_msg = result.stderr.decode("utf-8", errors="ignore")
+                        st.error(f"Conversion error details: {error_msg}")
                 except Exception as e:
                     st.error(f"Error during conversion: {e}")
 
