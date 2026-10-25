@@ -24,6 +24,8 @@ if "saved_target_url" not in st.session_state:
     st.session_state.saved_target_url = ""
 if "saved_format_type" not in st.session_state:
     st.session_state.saved_format_type = ""
+if "download_history" not in st.session_state:
+    st.session_state.download_history = []
 
 # Exact UI Styling with Professional SVG Platform Icons
 st.markdown("""
@@ -132,7 +134,7 @@ st.markdown("""
         <div style="display: flex; align-items: center; gap: 10px;">
             <div style="background: #0b0f19; padding: 8px 12px; border-radius: 12px; border: 1px solid #30363d; position: relative; display: flex; align-items: center; justify-content: center;">
                 <span style="font-size: 16px;">☁️</span>
-                <span style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 50%;">0</span>
+                <span style="position: absolute; top: -5px; right: -5px; background: #dc2626; color: white; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 50%;">{}</span>
             </div>
             <div style="background: #0b0f19; padding: 6px 12px; border-radius: 12px; border: 1px solid #30363d; display: flex; align-items: center; gap: 6px;">
                 <span style="font-size: 14px;">👤</span>
@@ -140,26 +142,9 @@ st.markdown("""
             </div>
         </div>
     </div>
-""", unsafe_allow_html=True)
+""".format(len(st.session_state.download_history)), unsafe_allow_html=True)
 
-# --- FIRST CARD: SEARCH HUB ---
-st.markdown("""
-    <div class="card-box">
-        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">SEARCH</p>
-""", unsafe_allow_html=True)
-
-target_url = st.text_input("", placeholder="Paste link or search songs, videos, apps...", label_visibility="collapsed")
-format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio"])
-
-if st.button("🔍 Search", use_container_width=True) and target_url:
-    st.session_state.saved_target_url = target_url
-    st.session_state.saved_format_type = format_type
-    st.session_state.ad_step = True
-    st.session_state.review_step = False
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-# --- SECOND CARD: QUICK PLATFORMS & SHORTCUTS WITH REAL SVG ICONS ---
+# --- FIRST CARD: QUICK PLATFORMS & SHORTCUTS ---
 st.markdown("""
     <div class="card-box">
         <p style="color: #9ca3af; font-size: 12px; font-weight: bold; margin-bottom: 15px;">Quick Platforms & Shortcuts:</p>
@@ -217,6 +202,23 @@ with col6:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
+# --- SECOND CARD: SEARCH & PASTE LINK HUB ---
+st.markdown("""
+    <div class="card-box">
+        <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">SEARCH & PASTE LINK</p>
+""", unsafe_allow_html=True)
+
+target_url = st.text_input("", placeholder="Paste link or search songs, videos, apps...", label_visibility="collapsed")
+format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio"])
+
+if st.button("🔍 Search", use_container_width=True) and target_url:
+    st.session_state.saved_target_url = target_url
+    st.session_state.saved_format_type = format_type
+    st.session_state.ad_step = True
+    st.session_state.review_step = False
+
+st.markdown("</div>", unsafe_allow_html=True)
+
 # --- AD FLOW & MEDIA PLAYER SECTION ---
 if st.session_state.ad_step and st.session_state.saved_target_url:
     current_link = st.session_state.saved_target_url
@@ -263,6 +265,11 @@ if st.session_state.review_step and st.session_state.saved_target_url:
         if direct_url:
             shortened_url = shorten_with_shrinkme(direct_url)
 
+            # Automatically save into gallery history if not already added
+            history_item = {"title": title, "url": active_url, "format": active_format}
+            if history_item not in st.session_state.download_history:
+                st.session_state.download_history.insert(0, history_item)
+
             st.success("Media Ready for Download!")
 
             st.markdown(f"""
@@ -283,17 +290,33 @@ if st.session_state.review_step and st.session_state.saved_target_url:
     except Exception as ex:
         st.error(f"Extraction error: {ex}")
 
-# --- THIRD CARD: ACTIVE DOWNLOADS & GALLERY STATUS ---
+# --- THIRD CARD: ACTIVE DOWNLOADS & GALLERY STATUS (Dynamic History Display) ---
 st.markdown("""
     <div class="card-box">
         <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">📁 Active Downloads & Gallery Status</p>
+""", unsafe_allow_html=True)
+
+if len(st.session_state.download_history) > 0:
+    for idx, item in enumerate(st.session_state.download_history):
+        st.markdown(f"""
+            <div style="background: #0b0f19; padding: 12px 16px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p style="color: #ffffff; font-size: 12px; font-weight: bold; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px;">🎵 {item['title']}</p>
+                    <p style="color: #4ade80; font-size: 10px; margin: 2px 0 0 0;">Format: {item['format']}</p>
+                </div>
+                <span style="background: #1e293b; color: #94a3b8; font-size: 10px; padding: 4px 8px; border-radius: 6px;">Saved</span>
+            </div>
+        """, unsafe_allow_html=True)
+else:
+    st.markdown("""
         <div style="background: #0b0f19; padding: 18px; border-radius: 12px; border: 1px solid #30363d; text-align: center;">
             <p style="color: #9ca3af; font-size: 11px; margin: 0; line-height: 1.5;">
                 No active downloads right now. Click the top-right download icon to view completed files and options!
             </p>
         </div>
-    </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Final Footer
 st.markdown("<p style='text-align: center; color: #9ca3af; font-size: 11px; margin-top: 30px;'>YT Dodo Universal Media Hub © 2026 | Created by Sagar Shukla</p>", unsafe_allow_html=True)
