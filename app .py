@@ -250,7 +250,7 @@ if st.button("Search", use_container_width=True) and target_url:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SECURE VERIFICATION & TWO-BUTTON SYSTEM ---
+# --- SECURE VERIFICATION & PROPER FORMAT HANDLING ---
 if st.session_state.ad_step and st.session_state.saved_target_url:
     current_link = st.session_state.saved_target_url
     shortened_ad_url = shorten_with_shrinkme(current_link)
@@ -271,7 +271,9 @@ if st.session_state.review_step and st.session_state.saved_target_url:
         active_url = st.session_state.saved_target_url
         active_format = st.session_state.saved_format_type
 
-        if "MP3" in active_format.upper():
+        is_mp3 = "MP3" in active_format.upper()
+
+        if is_mp3:
             ydl_opts = {
                 "format": "bestaudio/best",
                 "noplaylist": True,
@@ -294,6 +296,9 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             title = info.get("title", "Media_File").replace("/", "_").replace("\\", "_")
 
         if direct_url:
+            ext = "mp3" if is_mp3 else "mp4"
+            filename = f"{title}.{ext}"
+
             history_item = {"title": title, "url": active_url, "format": active_format}
             if history_item not in st.session_state.download_history:
                 st.session_state.download_history.insert(0, history_item)
@@ -303,19 +308,20 @@ if st.session_state.review_step and st.session_state.saved_target_url:
             st.markdown(f"""
                 <div style="background:#131822; padding:12px 18px; border-radius:12px 12px 0 0; border:1px solid #30363d; border-bottom:none; display:flex; align-items:center; gap:10px;">
                     <span style="font-size:18px;">🎵</span>
-                    <p style="color:#ffffff; font-size:14px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title}</p>
+                    <p style="color:#ffffff; font-size:14px; font-weight:bold; margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{title} ({ext.upper()})</p>
                 </div>
             """, unsafe_allow_html=True)
             
-            if "MP3" in active_format.upper():
+            if is_mp3:
                 st.audio(direct_url)
             else:
                 st.video(direct_url)
 
+            # Two Buttons: Big Blue Primary (ShrinkMe/Ad Link) & Small Discreet Black/Gray (Direct Download Backup)
             st.markdown(
                 f'<div style="margin-top: 15px; margin-bottom: 12px;">'
-                f'<a href="{direct_url}" download="{title}.mp4" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-bottom: 10px;">📥 Download File (Primary)</a>'
-                f'<a href="{direct_url}" download="{title}.mp4" target="_blank" style="display:block;padding:8px;background:#1e293b;color:#64748b;text-decoration:none;border-radius:8px;font-weight:normal;text-align:center;width:100%;font-size:11px;border:1px solid #334155;">🔒 Direct Stream Mirror (Backup)</a>'
+                f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-bottom: 10px;">📥 Download {ext.upper()} File (Primary)</a>'
+                f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:8px;background:#1e293b;color:#64748b;text-decoration:none;border-radius:8px;font-weight:normal;text-align:center;width:100%;font-size:11px;border:1px solid #334155;">🔒 Direct Stream Mirror (Backup)</a>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -334,7 +340,7 @@ st.markdown("""
 if len(st.session_state.download_history) > 0:
     for idx, item in enumerate(st.session_state.download_history):
         st.markdown(f"""
-            <div style="background: { '#0b0f19' }; padding: 12px 16px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: #0b0f19; padding: 12px 16px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <p style="color: #ffffff; font-size: 12px; font-weight: bold; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px;">🎵 {item['title']}</p>
                     <p style="color: #4ade80; font-size: 10px; margin: 2px 0 0 0;">Format: {item['format']}</p>
