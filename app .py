@@ -25,7 +25,7 @@ if "saved_target_url" not in st.session_state:
 if "saved_format_type" not in st.session_state:
     st.session_state.saved_format_type = ""
 
-# Exact UI Styling matching your reference dashboard layout
+# Exact UI Styling with Professional SVG Platform Icons
 st.markdown("""
     <style>
     .stApp {
@@ -34,14 +34,14 @@ st.markdown("""
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     .stTextInput input {
-        background-color: #131822 !important;
+        background-color: #0b0f19 !important;
         color: #ffffff !important;
         border: 1px solid #30363d !important;
         border-radius: 12px !important;
         padding: 12px 16px !important;
     }
     .stSelectbox select {
-        background-color: #131822 !important;
+        background-color: #0b0f19 !important;
         color: #ffffff !important;
         border: 1px solid #30363d !important;
         border-radius: 12px !important;
@@ -64,7 +64,7 @@ st.markdown("""
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
     .card-box {
@@ -72,40 +72,35 @@ st.markdown("""
         padding: 22px;
         border-radius: 16px;
         border: 1px solid #30363d;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     }
-    .shortcut-btn {
+    .shortcut-card {
         background: #0b0f19;
         border: 1px solid #30363d;
-        padding: 20px 10px;
+        padding: 15px 10px;
         border-radius: 14px;
         text-align: center;
         color: #ffffff;
         text-decoration: none;
-        font-size: 13px;
-        font-weight: bold;
         display: block;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         transition: 0.2s;
     }
-    .shortcut-btn:hover {
+    .shortcut-card:hover {
         border-color: #dc2626;
-        color: #ef4444;
     }
-    .add-url-btn {
+    .add-url-card {
         background: #0b0f19;
         border: 1px dashed #dc2626;
-        padding: 20px 10px;
+        padding: 15px 10px;
         border-radius: 14px;
         text-align: center;
         color: #ef4444;
         text-decoration: none;
-        font-size: 13px;
-        font-weight: bold;
         display: block;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -122,7 +117,7 @@ def shorten_with_shrinkme(long_url):
         pass
     return long_url
 
-# --- EXACT REFERENCE HEADER (No Logout, with Cloud Icon & Live User Counter) ---
+# --- TOP HEADER ---
 st.markdown("""
     <div class="main-header">
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -147,7 +142,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- SEARCH HUB SECTION ---
+# --- FIRST CARD: SEARCH HUB ---
 st.markdown("""
     <div class="card-box">
         <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">SEARCH</p>
@@ -156,7 +151,6 @@ st.markdown("""
 target_url = st.text_input("", placeholder="Paste link or search songs, videos, apps...", label_visibility="collapsed")
 format_type = st.selectbox("Choose output format", ["Video - 720p (HD)", "Video - 1080p (FHD)", "MP3 Audio"])
 
-# Search button layout matching reference
 if st.button("🔍 Search", use_container_width=True) and target_url:
     st.session_state.saved_target_url = target_url
     st.session_state.saved_format_type = format_type
@@ -165,27 +159,61 @@ if st.button("🔍 Search", use_container_width=True) and target_url:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- QUICK PLATFORMS & SHORTCUTS SECTION ---
+# --- SECOND CARD: QUICK PLATFORMS & SHORTCUTS WITH REAL SVG ICONS ---
 st.markdown("""
     <div class="card-box">
         <p style="color: #9ca3af; font-size: 12px; font-weight: bold; margin-bottom: 15px;">Quick Platforms & Shortcuts:</p>
 """, unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4)
+
 with col1:
-    st.markdown('<a href="https://www.youtube.com" target="_blank" class="shortcut-btn">🔴<br><span style="font-size:11px;">YouTube</span></a>', unsafe_allow_html=True)
+    st.markdown('''
+        <a href="https://www.youtube.com" target="_blank" class="shortcut-card">
+            <svg height="24" viewBox="0 0 24 24" width="24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#ff0000"/></svg>
+            <div style="font-size:11px; font-weight:bold; color:#ffffff; margin-top:6px;">YouTube</div>
+        </a>
+    ''', unsafe_allow_html=True)
+
 with col2:
-    st.markdown('<a href="https://www.google.com" target="_blank" class="shortcut-btn">🔵<br><span style="font-size:11px;">Google</span></a>', unsafe_allow_html=True)
+    st.markdown('''
+        <a href="https://www.google.com" target="_blank" class="shortcut-card">
+            <svg height="24" viewBox="0 0 24 24" width="24"><path d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.1 8.9 5 12 5z" fill="#ea4335"/><path d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z" fill="#4285f4"/><path d="M5.3 14.7c-.2-.7-.4-1.5-.4-2.7s.2-2 .4-2.7L1.6 6.4C.6 8.4 0 10.6 0 13s.6 4.6 1.6 6.6l3.7-2.9c-.3-.7-.5-1.4-.5-2z" fill="#fbbc05"/><path d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5.3L1.6 15.9C3.5 19.7 7.4 23 12 23z" fill="#34a853"/></svg>
+            <div style="font-size:11px; font-weight:bold; color:#ffffff; margin-top:6px;">Google</div>
+        </a>
+    ''', unsafe_allow_html=True)
+
 with col3:
-    st.markdown('<a href="https://www.facebook.com" target="_blank" class="shortcut-btn">📘<br><span style="font-size:11px;">Facebook</span></a>', unsafe_allow_html=True)
+    st.markdown('''
+        <a href="https://www.facebook.com" target="_blank" class="shortcut-card">
+            <svg height="24" viewBox="0 0 24 24" width="24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877f2"/></svg>
+            <div style="font-size:11px; font-weight:bold; color:#ffffff; margin-top:6px;">Facebook</div>
+        </a>
+    ''', unsafe_allow_html=True)
+
 with col4:
-    st.markdown('<a href="https://www.instagram.com" target="_blank" class="shortcut-btn">📸<br><span style="font-size:11px;">Instagram</span></a>', unsafe_allow_html=True)
+    st.markdown('''
+        <a href="https://www.instagram.com" target="_blank" class="shortcut-card">
+            <svg height="24" viewBox="0 0 24 24" width="24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill="#e1306c"/></svg>
+            <div style="font-size:11px; font-weight:bold; color:#ffffff; margin-top:6px;">Instagram</div>
+        </a>
+    ''', unsafe_allow_html=True)
 
 col5, col6 = st.columns(2)
 with col5:
-    st.markdown('<a href="https://twitter.com" target="_blank" class="shortcut-btn">🐦<br><span style="font-size:11px;">Twitter</span></a>', unsafe_allow_html=True)
+    st.markdown('''
+        <a href="https://twitter.com" target="_blank" class="shortcut-card">
+            <svg height="24" viewBox="0 0 24 24" width="24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#ffffff"/></svg>
+            <div style="font-size:11px; font-weight:bold; color:#ffffff; margin-top:6px;">Twitter</div>
+        </a>
+    ''', unsafe_allow_html=True)
 with col6:
-    st.markdown('<a href="#" class="add-url-btn">➕<br><span style="font-size:11px;">Add URL</span></a>', unsafe_allow_html=True)
+    st.markdown('''
+        <a href="#" class="add-url-card">
+            <div style="font-size:22px; font-weight:bold; color:#ef4444; line-height:24px;">+</div>
+            <div style="font-size:11px; font-weight:bold; color:#ef4444; margin-top:6px;">Add URL</div>
+        </a>
+    ''', unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
@@ -255,7 +283,7 @@ if st.session_state.review_step and st.session_state.saved_target_url:
     except Exception as ex:
         st.error(f"Extraction error: {ex}")
 
-# --- ACTIVE DOWNLOADS & GALLERY STATUS ---
+# --- THIRD CARD: ACTIVE DOWNLOADS & GALLERY STATUS ---
 st.markdown("""
     <div class="card-box">
         <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">📁 Active Downloads & Gallery Status</p>
