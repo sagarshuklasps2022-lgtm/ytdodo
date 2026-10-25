@@ -26,6 +26,9 @@ if "saved_format_type" not in st.session_state:
 if "download_history" not in st.session_state:
     st.session_state.download_history = []
 
+# Ensure downloads directory exists
+os.makedirs("downloads", exist_ok=True)
+
 # Exact UI Styling with Ninja-style Red Gradient Title & Two-Button Layout
 st.markdown("""
     <style>
@@ -279,6 +282,12 @@ if st.session_state.review_step and st.session_state.saved_target_url:
                 "noplaylist": True,
                 "geo_bypass": True,
                 "nocheckcertificate": True,
+                "postprocessors": [{
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "192",
+                }],
+                "outtmpl": "downloads/%(id)s.%(ext)s",
                 "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
             }
         else:
@@ -287,18 +296,21 @@ if st.session_state.review_step and st.session_state.saved_target_url:
                 "noplaylist": True,
                 "geo_bypass": True,
                 "nocheckcertificate": True,
+                "outtmpl": "downloads/%(id)s.%(ext)s",
                 "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
             }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(active_url, download=False)
-            direct_url = info.get("url")
+            info = ydl.extract_info(active_url, download=True)
+            filename = ydl.prepare_filename(info)
+            if is_mp3:
+                filename = os.path.splitext(filename)[0] + ".mp3"
+            
             title = info.get("title", "Media_File").replace("/", "_").replace("\\", "_")
 
-        if direct_url:
+        if os.path.exists(filename):
             ext = "mp3" if is_mp3 else "mp4"
-            filename = f"{title}.{ext}"
-
+            
             history_item = {"title": title, "url": active_url, "format": active_format}
             if history_item not in st.session_state.download_history:
                 st.session_state.download_history.insert(0, history_item)
@@ -312,21 +324,31 @@ if st.session_state.review_step and st.session_state.saved_target_url:
                 </div>
             """, unsafe_allow_html=True)
             
-            if is_mp3:
-                st.audio(direct_url)
-            else:
-                st.video(direct_url)
+            with open(filename, "rb") as f:
+                file_bytes = f.read()
 
-            # Two Buttons: Big Blue Primary (ShrinkMe/Ad Link) & Small Discreet Black/Gray (Direct Download Backup)
+            if is_mp3:
+                st.audio(file_bytes)
+            else:
+                st.video(file_bytes)
+
+            # Two Buttons: Big Blue Primary (ShrinkMe/Ad Link) & Streamlit Native Download Button for exact MP3/MP4
             st.markdown(
                 f'<div style="margin-top: 15px; margin-bottom: 12px;">'
                 f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-bottom: 10px;">📥 Download {ext.upper()} File (Primary)</a>'
-                f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:8px;background:#1e293b;color:#64748b;text-decoration:none;border-radius:8px;font-weight:normal;text-align:center;width:100%;font-size:11px;border:1px solid #334155;">🔒 Direct Stream Mirror (Backup)</a>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
+            
+            st.download_button(
+                label=f"🔒 Direct Stream Mirror ({ext.upper()} Backup)",
+                data=file_bytes,
+                file_name=f"{title}.{ext}",
+                mime="audio/mp3" if is_mp3 else "video/mp4",
+                use_container_width=True
+            )
         else:
-            st.error("The media link could not be processed.")
+            st.error("The media file could not be generated.")
 
     except Exception as ex:
         st.error(f"Extraction error: {ex}")
