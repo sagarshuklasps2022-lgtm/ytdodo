@@ -27,11 +27,11 @@ if "saved_format_type" not in st.session_state:
 if "download_history" not in st.session_state:
     st.session_state.download_history = []
 
-# Exact UI Styling matching your gorgeous Dark-Red Gradient background reference
+# Exact UI Styling with 45-degree Diagonal Red-to-Black Gradient Background
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(180deg, #1a0505 0%, #0b0f19 50%, #0b0f19 100%);
+        background: linear-gradient(135deg, #450a0a 0%, #1f0505 35%, #0b0f19 70%, #030712 100%);
         color: #ffffff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -138,7 +138,7 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# --- FIRST CARD: QUICK PLATFORMS & SHORTCUTS (With Rocket Emoji as in reference) ---
+# --- FIRST CARD: QUICK PLATFORMS & SHORTCUTS ---
 st.markdown("""
     <div class="card-box">
         <p style="color: #ef4444; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 0.5px;">🚀 QUICK PLATFORMS & SHORTCUTS</p>
@@ -180,7 +180,7 @@ with col4:
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- SECOND CARD: UNIVERSAL VIDEO & MEDIA DOWNLOADER (With Magnifying Glass Emoji as in reference) ---
+# --- SECOND CARD: UNIVERSAL VIDEO & MEDIA DOWNLOADER ---
 st.markdown("""
     <div class="card-box">
         <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">🔍 UNIVERSAL VIDEO & MEDIA DOWNLOADER</p>
