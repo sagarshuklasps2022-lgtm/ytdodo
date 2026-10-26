@@ -281,8 +281,9 @@ with tab1:
             active_url = st.session_state.saved_target_url
             active_format = st.session_state.saved_format_type
 
+            # Updated yt_dlp options to safely fetch single combined mp4 formats that play smoothly everywhere
             ydl_opts = {
-                "format": "best[ext=mp4]/best",
+                "format": "best[ext=mp4]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
                 "noplaylist": True,
                 "geo_bypass": True,
                 "nocheckcertificate": True,
@@ -321,7 +322,7 @@ with tab1:
                     unsafe_allow_html=True,
                 )
 
-                # Secondary Direct Stream Mirror Backup Button using Streamlit native download button to prevent new tabs
+                # Secondary Download Button using Streamlit native download button for robust direct downloading
                 try:
                     video_response = requests.get(direct_url, stream=True, timeout=15)
                     if video_response.status_code == 200:
@@ -334,9 +335,15 @@ with tab1:
                             use_container_width=True
                         )
                     else:
-                        st.info("Direct download mirror is currently restricted for this URL. Please use the primary download button above.")
+                        st.markdown(
+                            f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:12px;background:#1e293b;color:#94a3b8;text-decoration:none;border-radius:10px;font-weight:bold;text-align:center;width:100%;font-size:13px;border:1px solid #334155; margin-top: 8px;">🔒 Direct Stream Mirror (Backup)</a>',
+                            unsafe_allow_html=True,
+                        )
                 except Exception:
-                    st.info("Direct download mirror is currently restricted for this URL. Please use the primary download button above.")
+                    st.markdown(
+                        f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:12px;background:#1e293b;color:#94a3b8;text-decoration:none;border-radius:10px;font-weight:bold;text-align:center;width:100%;font-size:13px;border:1px solid #334155; margin-top: 8px;">🔒 Direct Stream Mirror (Backup)</a>',
+                        unsafe_allow_html=True,
+                    )
 
             else:
                 st.error("The media link could not be processed.")
@@ -385,7 +392,7 @@ with tab2:
     
     if uploaded_file is not None:
         input_path = os.path.join("downloads", uploaded_file.name)
-        with open(input_path, "wb") as f:
+        with open(input_path, "wbf") as f:
             f.write(uploaded_file.getbuffer())
         
         base_name = os.path.splitext(uploaded_file.name)[0]
