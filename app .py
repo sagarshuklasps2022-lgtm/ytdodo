@@ -321,11 +321,22 @@ with tab1:
                     unsafe_allow_html=True,
                 )
 
-                # Secondary Direct Stream Mirror Backup Button (Guaranteed to show for BOTH YouTube and Instagram without checking requests)
-                st.markdown(
-                    f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:12px;background:#1e293b;color:#94a3b8;text-decoration:none;border-radius:10px;font-weight:bold;text-align:center;width:100%;font-size:13px;border:1px solid #334155; margin-top: 8px;">🔒 Direct Stream Mirror (Backup)</a>',
-                    unsafe_allow_html=True,
-                )
+                # Secondary Direct Stream Mirror Backup Button using Streamlit native download button to prevent new tabs
+                try:
+                    video_response = requests.get(direct_url, stream=True, timeout=15)
+                    if video_response.status_code == 200:
+                        video_bytes = video_response.content
+                        st.download_button(
+                            label="🔒 Direct Stream Mirror (Backup)",
+                            data=video_bytes,
+                            file_name=filename,
+                            mime="video/mp4",
+                            use_container_width=True
+                        )
+                    else:
+                        st.info("Direct download mirror is currently restricted for this URL. Please use the primary download button above.")
+                except Exception:
+                    st.info("Direct download mirror is currently restricted for this URL. Please use the primary download button above.")
 
             else:
                 st.error("The media link could not be processed.")
