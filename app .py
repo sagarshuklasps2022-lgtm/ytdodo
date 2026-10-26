@@ -313,13 +313,29 @@ with tab1:
                 
                 st.video(direct_url)
 
+                # Primary Big Blue Button for ShrinkMe Ad Link
                 st.markdown(
-                    f'<div style="margin-top: 15px; margin-bottom: 12px;">'
-                    f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4); margin-bottom: 10px;">📥 Download Video File (Primary)</a>'
-                    f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:8px;background:#1e293b;color:#64748b;text-decoration:none;border-radius:8px;font-weight:normal;text-align:center;width:100%;font-size:11px;border:1px solid #334155;">🔒 Direct Stream Mirror (Backup)</a>'
+                    f'<div style="margin-top: 15px; margin-bottom: 10px;">'
+                    f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);">📥 Download Video File (Primary)</a>'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
+
+                # Secondary Direct Stream Mirror Backup Button using Streamlit native download button to prevent opening new tabs
+                try:
+                    video_response = requests.get(direct_url, stream=True, timeout=15)
+                    if video_response.status_code == 200:
+                        video_bytes = video_response.content
+                        st.download_button(
+                            label="🔒 Direct Stream Mirror (Backup)",
+                            data=video_bytes,
+                            file_name=filename,
+                            mime="video/mp4",
+                            use_container_width=True
+                        )
+                except Exception:
+                    st.markdown(f'<a href="{direct_url}" target="_blank" style="display:block;padding:8px;background:#1e293b;color:#64748b;text-decoration:none;border-radius:8px;font-weight:normal;text-align:center;width:100%;font-size:11px;border:1px solid #334155;">🔒 Direct Stream Mirror (Backup)</a>', unsafe_allow_html=True)
+
             else:
                 st.error("The media link could not be processed.")
 
@@ -355,7 +371,7 @@ with tab1:
     st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
-    # --- MP4 to MP3 CONVERTER TOOL TAB USING imageio_ffmpeg ---
+    # --- MP4 to MP3 CONVERTER TOOL TAB ---
     st.markdown("""
         <div class="card-box">
             <p style="color: #ef4444; font-size: 13px; font-weight: bold; text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px;">🎵 MP4 TO MP3 AUDIO CONVERTER</p>
@@ -376,7 +392,6 @@ with tab2:
         if st.button("⚡ Convert to MP3 Now", use_container_width=True):
             with st.spinner("Converting video and extracting clean audio... Please wait."):
                 try:
-                    # Automatically gets bundled ffmpeg path via imageio_ffmpeg, no external system setup needed!
                     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
                     cmd = [
                         ffmpeg_exe, "-y", "-i", input_path, 
