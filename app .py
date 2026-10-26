@@ -236,7 +236,7 @@ with tab1:
     with col4:
         st.markdown('''
             <a href="https://www.instagram.com" target="_blank" class="shortcut-card">
-                <svg height="24" viewBox="0 0 24 24" width="24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.79-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill="#e1306c"/></svg>
+                <svg height="24" viewBox="0 0 24 24" width="24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" fill="#e1306c"/></svg>
                 <div style="font-size:11px; font-weight:bold; color:#ffffff; margin-top:6px;">Instagram</div>
             </a>
         ''', unsafe_allow_html=True)
@@ -281,13 +281,13 @@ with tab1:
             active_url = st.session_state.saved_target_url
             active_format = st.session_state.saved_format_type
 
-            # Robust yt-dlp config to fetch direct playable and downloadable mp4 format
+            # Advanced yt_dlp options with robust player client fallbacks to bypass restrictions
             ydl_opts = {
                 "format": "best[ext=mp4]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
                 "noplaylist": True,
                 "geo_bypass": True,
                 "nocheckcertificate": True,
-                "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+                "extractor_args": {"youtube": {"player_client": ["android", "ios", "web"]}},
             }
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -314,7 +314,7 @@ with tab1:
                 
                 st.video(direct_url)
 
-                # Primary Big Blue Button for ShrinkMe Ad Link
+                # Primary Big Blue Button for ShrinkMe Ad Link (Main Monetization & Download)
                 st.markdown(
                     f'<div style="margin-top: 15px; margin-bottom: 10px;">'
                     f'<a href="{shortened_ad_url}" target="_blank" style="display:block;padding:16px 24px;background:linear-gradient(135deg, #2563eb, #1d4ed8);color:white;text-decoration:none;border-radius:12px;font-weight:bold;text-align:center;width:100%;font-size:15px;box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);">📥 Download Video File (Primary)</a>'
@@ -322,23 +322,28 @@ with tab1:
                     unsafe_allow_html=True,
                 )
 
-                # Secondary Direct Backup Download Button (Downloading file locally first to prevent browser from opening video player in new tab)
+                # Secondary Direct Stream Mirror Backup Button with robust fallback
                 try:
-                    with st.spinner("Preparing direct download file... Please wait."):
-                        video_response = requests.get(direct_url, stream=True, timeout=30)
-                        if video_response.status_code == 200:
-                            video_bytes = video_response.content
-                            st.download_button(
-                                label="🔒 Direct Stream Mirror (Backup)",
-                                data=video_bytes,
-                                file_name=filename,
-                                mime="video/mp4",
-                                use_container_width=True
-                            )
-                        else:
-                            st.info("Direct stream mirror is currently restricted by the platform. Please use the primary download button above.")
+                    video_response = requests.get(direct_url, stream=True, timeout=15)
+                    if video_response.status_code == 200:
+                        video_bytes = video_response.content
+                        st.download_button(
+                            label="🔒 Direct Stream Mirror (Backup)",
+                            data=video_bytes,
+                            file_name=filename,
+                            mime="video/mp4",
+                            use_container_width=True
+                        )
+                    else:
+                        st.markdown(
+                            f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:12px;background:#1e293b;color:#94a3b8;text-decoration:none;border-radius:10px;font-weight:bold;text-align:center;width:100%;font-size:13px;border:1px solid #334155; margin-top: 8px;">🔒 Direct Stream Mirror (Backup)</a>',
+                            unsafe_allow_html=True,
+                        )
                 except Exception:
-                    st.info("Direct stream mirror is currently restricted by the platform. Please use the primary download button above.")
+                    st.markdown(
+                        f'<a href="{direct_url}" download="{filename}" target="_blank" style="display:block;padding:12px;background:#1e293b;color:#94a3b8;text-decoration:none;border-radius:10px;font-weight:bold;text-align:center;width:100%;font-size:13px;border:1px solid #334155; margin-top: 8px;">🔒 Direct Stream Mirror (Backup)</a>',
+                        unsafe_allow_html=True,
+                    )
 
             else:
                 st.error("The media link could not be processed.")
